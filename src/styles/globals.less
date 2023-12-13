@@ -55,6 +55,14 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-black text-foreground;
   }
+}
+
+.primary-text {
+  @apply text-2xl font-semibold text-light;
+}
+
+.tab_trigger {
+  @apply border-b  border-b-white/20  data-[state=active]:border-light data-[state=active]:text-white;
 }

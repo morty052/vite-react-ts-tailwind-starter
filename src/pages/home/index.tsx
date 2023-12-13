@@ -1,15 +1,11 @@
-import { Helmet } from 'react-helmet'
-import { useTranslation } from 'react-i18next'
+import { Navbar } from 'src/components'
 import { Hero } from 'src/components/hero'
 
-export default function Home() {
-  const { t } = useTranslation('translation')
+export function Home() {
   return (
-    <>
-      <Helmet>
-        <title>{t('title')}</title>
-      </Helmet>
+    <div className="pb-10">
+      <Navbar />
       <Hero />
-    </>
+    </div>
   )
 }

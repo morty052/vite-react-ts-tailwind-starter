@@ -1,15 +1,26 @@
 import React, { useMemo } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { RouterProvider } from 'react-router-dom'
-import { createRouter } from './router'
+import { router } from './router'
+import { Toaster } from './components/ui/toaster'
+import './styles/app.css'
+import { ChatContextProvider } from './contexts/ChatContext'
+import { ClerkProvider } from '@clerk/clerk-react'
 
 export default function App() {
   const queryClient = useMemo(() => new QueryClient({}), [])
+
+  const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={createRouter()} />
-      <ReactQueryDevtools />
+      <ClerkProvider publishableKey={clerkPubKey}>
+        <ChatContextProvider>
+          <RouterProvider router={router} />
+        </ChatContextProvider>
+        <Toaster />
+      </ClerkProvider>
+      {/* <ReactQueryDevtools /> */}
     </QueryClientProvider>
   )
 }

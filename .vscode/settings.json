@@ -1,11 +1,12 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.fixAll.stylelint": true
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
   },
   "git.ignoreLimitWarning": true,
   "editor.quickSuggestions": {
     "strings": true
-  }
+  },
+  "i18n-ally.localesPaths": ["src/i18n", "src/i18n/locales"]
 }
