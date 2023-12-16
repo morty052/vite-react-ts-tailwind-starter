@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { MoreVertical, Search } from 'lucide-react'
 import {
   DropdownMenu,
@@ -8,8 +8,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
+import { useLocation } from 'react-router-dom'
 
-type Props = {}
+type ReccomendationCardProps = {
+  name: string
+  avatar: string
+  username: string
+}
 
 const SearchBar = () => {
   return (
@@ -26,7 +31,7 @@ const SearchBar = () => {
   )
 }
 
-const ReccomendationCard = () => {
+const ReccomendationCard = ({ name, avatar, username }: ReccomendationCardProps) => {
   const MenuButton = () => {
     return (
       <div className="absolute right-0 top-2 flex justify-end ">
@@ -35,7 +40,7 @@ const ReccomendationCard = () => {
             <MoreVertical color="white" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Add to bunnies</DropdownMenuItem>
             <DropdownMenuItem>Subscribe</DropdownMenuItem>
@@ -62,28 +67,48 @@ const ReccomendationCard = () => {
       />
       <div className="absolute inset-x-0 bottom-0 top-[60%] flex justify-end bg-black/50 px-2 ">
         <div className="">
-          <p className="font-semibold text-light">Alexander Gaucho</p>
-          <p className="text-sm text-light">@alexgaucho</p>
+          <p className="font-semibold text-light">{name}</p>
+          <p className="text-xs text-light">@{username}</p>
         </div>
       </div>
     </div>
   )
 }
 
-const Reccomendations = () => {
+const Reccomendations = ({ recommended }: { recommended: any }) => {
   return (
-    <div className="">
-      <ReccomendationCard />
+    <div className="space-y-4">
+      <p className="primary-text">Recommended</p>
+      {recommended?.map((bunny: any, index: number) => (
+        <ReccomendationCard {...bunny} key={index} />
+      ))}
     </div>
   )
 }
 
 export function RecommendationBar() {
+  const [recommended, setRecommended] = useState([])
+
+  const path = useLocation().pathname
+
+  const isProfile = path.includes('bunny')
+
+  async function getRecommended() {
+    const res = await fetch('http://192.168.100.16:3000/bunny/recommended')
+    const data = await res.json()
+    const { bunnies } = data
+    setRecommended(bunnies)
+  }
+
+  useEffect(() => {
+    getRecommended()
+  }, [])
+
   return (
-    <div className=" col-span-3  hidden min-h-screen space-y-4 border bg-black px-2 lg:block">
+    <div className=" col-span-3  hidden min-h-screen space-y-4 border-l bg-black px-2 lg:block">
       <div className="sticky top-0 flex flex-col items-center gap-y-4 pt-4">
-        <SearchBar />
-        <Reccomendations />
+        {!isProfile && <SearchBar />}
+        <Reccomendations recommended={recommended} />
       </div>
     </div>
   )

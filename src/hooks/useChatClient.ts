@@ -3,12 +3,19 @@ import { StreamChat } from 'stream-chat'
 
 export const chatClient = new StreamChat('4tfg8w9fwvvu')
 
-export async function createChat(user: string, newContact: string) {
+export async function createChat(user: string, newContact: string, bunny_id: string) {
   const channel = chatClient.channel('messaging', {
     members: [`${user}`, `${newContact}`],
   })
+
+  const addBunnyToContacts = async () => {
+    const res = await fetch(`http://localhost:3000/users/likebunny?username=${user}&bunny_id=${bunny_id}`)
+    const data = await res.json()
+    console.log(data)
+  }
   try {
     await channel.create()
+    await addBunnyToContacts()
     console.log('Channel Created!')
   } catch (error) {
     console.log(error)

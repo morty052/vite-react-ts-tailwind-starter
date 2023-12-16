@@ -2,7 +2,7 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import { BottomNav, Header, RecommendationBar, Sidebar } from 'src/components'
 import { Bunnies } from '../bunnies'
 import { Profile } from '../profile'
-import { EventsPage, NotificationsPage, UserProfile, DirectMessages } from './views'
+import { EventsPage, NotificationsPage, UserProfile, DirectMessages, Wallet } from './views'
 
 type Props = {}
 
@@ -24,6 +24,7 @@ function DashBoardRoutes() {
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/directmessages" element={<DirectMessages />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/wallet" element={<Wallet />} />
       </Routes>
     </div>
   )

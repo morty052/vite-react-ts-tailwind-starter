@@ -7,22 +7,16 @@ import { InteractionModalButton } from 'src/components'
 import { useToast } from 'src/components/ui/use-toast'
 import { createChat } from 'src/hooks/useChatClient'
 import { useChatContextParams } from 'src/contexts/ChatContext'
+import { bunny } from 'src/types/bunny'
 
-type bunny = {
-  avatar: string
-  name: string
-  reel: string[]
-  _id: string
-}
-
-function InteractionButtons({ bunny_id }: { bunny_id: string }) {
+function InteractionButtons({ bunny_id, bunny_name }: { bunny_id: string; bunny_name: string }) {
   const { toast } = useToast()
   const { username } = useChatContextParams()
   return (
     <div className=" flex items-center justify-end gap-x-4 px-2 pt-4">
       <button
         // onClick={() => toast({ title: 'Message sent!', description: 'Friday, February 10, 2023 at 5:57 PM' })}
-        onClick={() => createChat(username, bunny_id)}
+        onClick={() => createChat(username, bunny_name, bunny_id)}
         className="grid h-14 w-14 place-content-center rounded-full border-2 border-white p-2"
       >
         <Heart color="white" />
@@ -84,24 +78,15 @@ function SubscriptionStatus() {
   )
 }
 
-function MainProfile({
-  avatar,
-  name,
-  reel,
-  bunny_id,
-}: {
-  avatar: string | undefined
-  name: string | undefined
-  reel: string[]
-  bunny_id: string
-}) {
+function MainProfile({ bunny }: { bunny: bunny }) {
+  const { avatar, name, _id } = bunny
   return (
     <div className="col-span-4 w-full">
       <ProfileHeader avatar={avatar} />
-      <InteractionButtons bunny_id={name as string} />
+      <InteractionButtons bunny_name={name} bunny_id={_id as string} />
       <Bio name={name} />
       <SubscriptionStatus />
-      <ProfileTabs bunny_id={bunny_id} reel={reel} />
+      <ProfileTabs bunny={bunny} />
     </div>
   )
 }
@@ -109,7 +94,6 @@ function MainProfile({
 export function Profile() {
   const [bunny, setBunny] = useState<bunny | null>(null)
   const { id } = useParams()
-  const { avatar, name } = bunny ?? {}
 
   async function getBunny() {
     const res = await fetch(`http://192.168.100.16:3000/bunny/profile?id=${id}`)
@@ -127,9 +111,7 @@ export function Profile() {
 
   return (
     <>
-      {/* <div className="min-h-screen grid-cols-6  lg:grid">
-      </div> */}
-      <MainProfile bunny_id={bunny?._id} reel={bunny?.reel} avatar={avatar} name={name} />
+      <MainProfile bunny={bunny} />
     </>
   )
 }

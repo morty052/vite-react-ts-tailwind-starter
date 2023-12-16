@@ -1,4 +1,4 @@
-import { Bell, Calendar, MessageCircleIcon, Rabbit, UserCircle } from 'lucide-react'
+import { Calendar, MessageCircleIcon, Rabbit, UserCircle, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export function BottomNav() {
@@ -8,8 +8,8 @@ export function BottomNav() {
         <Link to={'/dashboard'}>
           <Rabbit />
         </Link>
-        <Link to={'notifications'}>
-          <Bell />
+        <Link to={'wallet'}>
+          <Wallet />
         </Link>
         <Link to={'calendar'}>
           <Calendar />

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllBunnies, getBunny } from '../lib/sanityClient.js'
+import { getAllBunnies, getBunny, getRecommendedBunnies } from '../lib/sanityClient.js'
 
 const bunnyRouter = express.Router()
 
@@ -14,6 +14,13 @@ bunnyRouter.get('/', (req, res) => {
 
 bunnyRouter.get('/allbunnies', async (req, res) => {
   const bunnies = await getAllBunnies()
+  res.send({
+    bunnies,
+  })
+})
+
+bunnyRouter.get('/recommended', async (req, res) => {
+  const bunnies = await getRecommendedBunnies()
   res.send({
     bunnies,
   })

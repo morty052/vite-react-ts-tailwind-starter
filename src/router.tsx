@@ -1,6 +1,6 @@
 import { createBrowserRouter, createRoutesFromChildren, Route } from 'react-router-dom'
 import ErrorPage from './components/error-page'
-import { Home, DashBoard, SignUpPage, SignInPage } from './pages'
+import { Home, DashBoard, SignUpPage, SignInPage, Pricing } from './pages'
 
 export const routerObjects = [
   {
@@ -18,6 +18,10 @@ export const routerObjects = [
   {
     path: '/signup',
     Component: <SignUpPage />,
+  },
+  {
+    path: '/pricing',
+    Component: <Pricing />,
   },
   {
     path: '*',

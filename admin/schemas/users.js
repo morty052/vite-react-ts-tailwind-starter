@@ -29,8 +29,22 @@ export default {
       type: 'array',
       of: [
         {
-          type: 'reference',
-          to: [{type: 'bunnies'}],
+          type: 'object',
+          name: 'bunny',
+          title: 'Bunny',
+          fields: [
+            {
+              name: 'bunny',
+              title: 'Bunny',
+              type: 'reference',
+              to: [{type: 'bunnies'}],
+            },
+            {
+              type: 'boolean',
+              name: 'liked',
+              title: 'Liked',
+            },
+          ],
         },
       ],
     },
@@ -59,6 +73,63 @@ export default {
               name: 'date',
               title: 'Date',
               type: 'date',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'orders',
+      title: 'Orders',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          title: 'order',
+          name: 'order',
+          fields: [
+            {
+              name: 'bunny',
+              title: 'Bunny',
+              type: 'reference',
+              to: [{type: 'bunnies'}],
+            },
+            // {
+            //   name: 'type',
+            //   title: 'type',
+            //   type: 'object',
+            //   fields: [
+            //     {
+            //       name: 'topup',
+            //       title: 'Topup',
+            //       type: 'boolean',
+            //     },
+            //     {
+            //       name: 'refund',
+            //       title: 'Refund',
+            //       type: 'boolean',
+            //     },
+            //     {
+            //       name: 'purchase',
+            //       title: 'Purchase',
+            //       type: 'boolean',
+            //     },
+            //   ],
+            // },
+            {
+              name: 'date',
+              title: 'Date',
+              type: 'date',
+            },
+            {
+              name: 'amount',
+              title: 'amount',
+              type: 'number',
+            },
+            {
+              name: 'event',
+              title: 'Event',
+              type: 'string',
             },
           ],
         },

@@ -2,18 +2,9 @@ import React, { useState } from 'react'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { chatClient } from 'src/hooks/useChatClient'
 import { DefaultGenerics } from 'stream-chat'
-import {
-  Avatar,
-  Channel,
-  ChannelList,
-  Chat,
-  MessageInput,
-  MessageList,
-  Thread,
-  Window,
-  useChatContext,
-} from 'stream-chat-react'
+import { Avatar, Channel, Chat, MessageInput, MessageList, Thread, Window } from 'stream-chat-react'
 import 'stream-chat-react/dist/css/v2/index.css'
+import { Contacts } from './components'
 
 export function DirectMessages() {
   const [channel, setchannel] = useState<DefaultGenerics | undefined>(undefined)
@@ -53,30 +44,15 @@ export function DirectMessages() {
   //   createChannel()
   // }, [token])
 
-  const Preview = (props) => {
-    const { onClick, displayTitle, watchers, channel, setActiveChannel, activeChannel } = props
-
-    function handleChannelSelect() {
-      setActiveChannel(channel, watchers)
-      setchannel(channel)
-    }
-
-    return (
-      <div className="">
-        <p onClick={handleChannelSelect}>{displayTitle}</p>
-      </div>
-    )
-  }
-
   const ChatHeader = (props) => {
-    const { client, channel } = useChatContext()
-    const title = channel?.id
+    const { contact, avatar } = channel ?? {}
+
     return (
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 p-2">
         <span onClick={() => setchannel(undefined)}>&#8592;</span>
         <div className="flex items-center gap-x-2">
-          <Avatar name="John Doe" />
-          <span>{title}</span>
+          <Avatar image={avatar} name={contact} />
+          <span>{contact}</span>
         </div>
       </div>
     )
@@ -88,8 +64,8 @@ export function DirectMessages() {
 
   return (
     <div className="relative -mt-20 flex h-screen flex-col">
-      <Chat client={chatClient}>
-        {!channel && <ChannelList Preview={Preview} filters={filters} options={options} />}
+      <Chat theme="str-chat__theme-dark" client={chatClient}>
+        <Contacts username={username} channell={channel} setChannel={setchannel} sort={sort} filters={filters} />
         {channel && (
           <Channel>
             <Window>

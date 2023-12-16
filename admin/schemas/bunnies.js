@@ -24,6 +24,43 @@ export default {
       type: 'boolean',
     },
     {
+      name: 'bio',
+      title: 'Bio',
+      type: 'string',
+    },
+    {
+      name: 'location',
+      title: 'Location',
+      type: 'string',
+    },
+    {
+      name: 'trending',
+      title: 'Trending',
+      type: 'boolean',
+    },
+    {
+      name: 'offers',
+      title: 'Offers',
+      type: 'object',
+      fields: [
+        {
+          name: 'video',
+          title: 'Video',
+          type: 'boolean',
+        },
+        {
+          name: 'photo',
+          title: 'Photo',
+          type: 'boolean',
+        },
+        {
+          name: 'date',
+          title: 'Date',
+          type: 'boolean',
+        },
+      ],
+    },
+    {
       name: 'photos',
       title: 'Photos',
       type: 'array',
@@ -32,6 +69,17 @@ export default {
           type: 'image',
           name: 'subimage',
           title: 'Image',
+        },
+      ],
+    },
+    {
+      name: 'followers',
+      title: 'followers',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'users'}],
         },
       ],
     },

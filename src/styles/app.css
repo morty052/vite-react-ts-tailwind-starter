@@ -8,13 +8,13 @@
   width: 45%;
 }
 
-.str-chat__container {
+/* .str-chat__container {
   @apply bg-red-300;
 }
 
 .str-chat__main-panel {
   @apply w-10 bg-red-300;
-}
+} */
 
 .str-chat__message-input {
   @apply fixed bottom-0 w-full;
