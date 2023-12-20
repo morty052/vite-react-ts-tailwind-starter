@@ -1,6 +1,7 @@
-import { ChannelList } from 'stream-chat-react'
-import { useNavigate } from 'react-router-dom'
+import { ChannelList, useChatContext } from 'stream-chat-react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { MessageCircle, Search, Video } from 'lucide-react'
 
 type ContactsProps = {
   sort: any
@@ -31,7 +32,10 @@ const Preview = (props) => {
     setChannel,
     Avatar,
     bunnies,
+    image,
   } = props
+
+  const { channel: MainChannel } = useChatContext()
 
   const bunnyAvatarUrl = bunnies.find((bunny) => bunny.name === displayTitle)?.avatar
 
@@ -44,13 +48,18 @@ const Preview = (props) => {
   }
 
   return (
-    <div onClick={handleChannelSelect} className="">
-      <div className="flex gap-x-2">
+    <div className="flex w-full items-center justify-between  p-2 ">
+      <div onClick={handleChannelSelect} className="flex items-center gap-x-2">
         <Avatar image={bunnyAvatarUrl} name={displayTitle} />
         <div className="">
-          <p className="text-light">{displayTitle}</p>
+          <p className="text-light first-letter:uppercase">{displayTitle}</p>
           <p className="text-xs  text-light"> {latestMessage}</p>
         </div>
+      </div>
+
+      <div className="flex gap-x-6">
+        <MessageCircle className="cursor-pointer" onClick={handleChannelSelect} />
+        <Video className="cursor-pointer" />
       </div>
     </div>
   )
@@ -59,10 +68,14 @@ const Preview = (props) => {
 const ContactListHeader = () => {
   const navigate = useNavigate()
   return (
-    <a onClick={() => navigate(-1)} className="flex gap-x-2 border-b p-2 text-light">
-      <span>&#8592;</span>
-      <span>Contacts</span>
-    </a>
+    <div className="flex  justify-between  p-2">
+      <a onClick={() => navigate(-1)} className="flex gap-x-2  text-light">
+        <span>&#8592;</span>
+        <span>Contacts</span>
+      </a>
+
+      <Search />
+    </div>
   )
 }
 
@@ -78,9 +91,20 @@ const CustomList = (props) => {
   }
 
   return (
-    <div className="h-screen bg-black">
+    <div className=" h-screen bg-dark">
       <ContactListHeader />
       <div className="space-y-4 p-2">{children}</div>
+    </div>
+  )
+}
+
+const NoContactScreens = () => {
+  return (
+    <div className=" border">
+      <div className="p">No Contacts yet</div>
+      <p>
+        Add <Link to={'/dashboard'}>bunnies</Link> to begin chatting
+      </p>
     </div>
   )
 }
@@ -98,14 +122,15 @@ export function Contacts(props: ContactsProps) {
 
   return (
     <>
-      {!channell && (
+      <div className={`sm:col-span-4 lg:col-span-3 ${channell && 'hidden sm:block'}`}>
         <ChannelList
+          EmptyStateIndicator={NoContactScreens}
           List={CustomList}
           Preview={(props) => <Preview bunnies={contacts} setChannel={setChannel} {...props} />}
           sort={sort}
           filters={filters}
         />
-      )}
+      </div>
     </>
   )
 }

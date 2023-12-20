@@ -1,5 +1,6 @@
 import { Calendar, LogOutIcon, MessageCircleIcon, RabbitIcon, UserCircle, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useChatContextParams } from 'src/contexts/ChatContext'
 
 const sidebarLinks = [
   {
@@ -30,6 +31,7 @@ const sidebarLinks = [
 ]
 
 const SidebarHeader = () => {
+  const { username } = useChatContextParams()
   const UserTokens = () => {
     return (
       <div className="flex items-center gap-x-2 ">
@@ -39,19 +41,24 @@ const SidebarHeader = () => {
     )
   }
 
+  const Initial = username?.charAt(0)?.toUpperCase()
+
   const UserAvatar = () => {
-    return <div className="h-12 w-12 rounded-full border "></div>
+    return (
+      <div className="grid h-12 w-12 place-content-center rounded-full border-4 border-dark bg-white ">
+        <div className=" text-2xl font-black text-dark">{Initial}</div>
+      </div>
+    )
   }
 
   return (
-    <div className="justify-center space-y-4 lg:w-full ">
+    <div className="mb-4 justify-center space-y-4 lg:w-full ">
       <div className="items-center  justify-between lg:flex lg:px-2  ">
         <UserAvatar />
         <div className="hidden lg:block">
           <UserTokens />
         </div>
       </div>
-      <hr className="w-full bg-white " />
     </div>
   )
 }

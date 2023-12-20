@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllBunnies, getBunny, getRecommendedBunnies } from '../lib/sanityClient.js'
+import { getAllBunnies, getBunny, getRecommendedBunnies, getBunnyContext } from '../lib/sanityClient.js'
 
 const bunnyRouter = express.Router()
 
@@ -13,9 +13,11 @@ bunnyRouter.get('/', (req, res) => {
 })
 
 bunnyRouter.get('/allbunnies', async (req, res) => {
-  const bunnies = await getAllBunnies()
+  const { username } = req.query
+  const { bunnies, following } = await getAllBunnies(username)
   res.send({
     bunnies,
+    following,
   })
 })
 
@@ -29,6 +31,12 @@ bunnyRouter.get('/recommended', async (req, res) => {
 bunnyRouter.get('/profile', async (req, res) => {
   const { id } = req.query
   const bunnies = await getBunny(id)
+  res.send(bunnies)
+})
+
+bunnyRouter.get('/context', async (req, res) => {
+  const { name } = req.query
+  const bunnies = await getBunnyContext(name)
   res.send(bunnies)
 })
 

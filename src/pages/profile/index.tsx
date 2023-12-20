@@ -1,13 +1,59 @@
-import { Heart } from 'lucide-react'
+import { CircleDollarSign, RabbitIcon, UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button } from 'src/components/ui/button'
 import { ProfileTabs } from './components'
-import { InteractionModalButton } from 'src/components'
+import { EventBooker, Header } from 'src/components'
 import { useToast } from 'src/components/ui/use-toast'
 import { createChat } from 'src/hooks/useChatClient'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { bunny } from 'src/types/bunny'
+import { Post } from 'src/types/post'
+import { Dialog, DialogContent } from 'src/components/ui/dialog'
+
+function SubscriptionModal({ open, setOpen, eventName, handleCreateEvent, insufficientBalance }) {
+  const EventConfirmation = () => {
+    return (
+      <div className="mt-4  px-2">
+        <div className="flex justify-center space-y-4 rounded-lg bg-white p-6">
+          <div className="space-y-4 text-center">
+            <p className="">{eventName}</p>
+            <div className="flex items-center gap-x-2">
+              <span className="text-sm">Spend </span>
+              <a className="flex gap-x-1">
+                <span className=" font-semibold text-dark">40</span>
+                <RabbitIcon color="pink" />
+              </a>
+              <span>To book a video chat</span>
+            </div>
+            <Button onClick={handleCreateEvent} size={'lg'}>
+              Confirm
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const PurchaseCredits = () => {
+    const event = eventName.toLowerCase()
+    return (
+      <div className="mt-4  px-2">
+        <div className="flex justify-center space-y-4 rounded-lg bg-white p-6">
+          <div className="space-y-4 text-center">
+            <p className=" first-letter:uppercase">Purchase more credits to book {event}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>{!insufficientBalance ? <EventConfirmation /> : <PurchaseCredits />}</DialogContent>
+    </Dialog>
+  )
+}
 
 function InteractionButtons({ bunny_id, bunny_name }: { bunny_id: string; bunny_name: string }) {
   const { toast } = useToast()
@@ -17,18 +63,20 @@ function InteractionButtons({ bunny_id, bunny_name }: { bunny_id: string; bunny_
       <button
         // onClick={() => toast({ title: 'Message sent!', description: 'Friday, February 10, 2023 at 5:57 PM' })}
         onClick={() => createChat(username, bunny_name, bunny_id)}
-        className="grid h-14 w-14 place-content-center rounded-full border-2 border-white p-2"
+        className="grid h-14 w-14 place-content-center rounded-full border-2 border-white "
       >
-        <Heart color="white" />
+        <UserPlus color="white" />
       </button>
-      <InteractionModalButton />
+      <button className="grid h-14 w-14 place-content-center rounded-full border-2 border-white ">
+        <CircleDollarSign color="white" />
+      </button>
     </div>
   )
 }
 
 function ProfileHeader({ avatar }: { avatar: string | undefined }) {
   return (
-    <div className="relative -mt-4 h-48 ">
+    <div className="relative  h-48 ">
       <img className=" h-48 w-full object-cover" src={avatar} alt="" />
       <div className="absolute -bottom-16 left-4 rounded-full border-2 border-white   ">
         <img className=" h-24 w-24 rounded-full object-cover " src={avatar} alt="" />
@@ -37,16 +85,13 @@ function ProfileHeader({ avatar }: { avatar: string | undefined }) {
   )
 }
 
-function Bio({ name }: { name: string | undefined }) {
+function Bio({ name, bio, username }: { name: string | undefined; bio: string; username: string }) {
   return (
     <>
       <div className="p-2">
         <p className="primary-text">{name}</p>
-        <p className="text-gray-400">@{name}</p>
-        <span className="text-light">
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Unde explicabo voluptatum veniam
-        </span>
-        InteractionButtons
+        <p className="text-gray-400">@{username}</p>
+        <span className="text-light">{bio}</span>
       </div>
       <hr className="mt-4" />
     </>
@@ -64,41 +109,36 @@ function SearchBarColumn() {
   )
 }
 
-function SubscriptionStatus() {
+function MainProfile({ bunny, posts }: { bunny: bunny; posts: Post[] }) {
+  const { avatar, name, _id, bio, username } = bunny
   return (
     <>
-      <div className="space-y-4 p-2">
-        <p className="primary-text">Subscription</p>
-        <Button className="bg-fuchsia-500" size={'lg'}>
-          Subscribe
-        </Button>
+      <Header bunnyName={name} isProfile />
+      <div className="col-span-4 w-full">
+        <ProfileHeader avatar={avatar} />
+        <InteractionButtons bunny_name={name} bunny_id={_id as string} />
+        <Bio username={username} bio={bio} name={name} />
+        <div className="md:hidden">
+          <EventBooker bunny_id={_id as string} />
+        </div>
+        <ProfileTabs posts={posts} bunny={bunny} />
       </div>
-      <hr className="my-4" />
     </>
-  )
-}
-
-function MainProfile({ bunny }: { bunny: bunny }) {
-  const { avatar, name, _id } = bunny
-  return (
-    <div className="col-span-4 w-full">
-      <ProfileHeader avatar={avatar} />
-      <InteractionButtons bunny_name={name} bunny_id={_id as string} />
-      <Bio name={name} />
-      <SubscriptionStatus />
-      <ProfileTabs bunny={bunny} />
-    </div>
   )
 }
 
 export function Profile() {
   const [bunny, setBunny] = useState<bunny | null>(null)
+  const [posts, setPosts] = useState([])
   const { id } = useParams()
 
   async function getBunny() {
     const res = await fetch(`http://192.168.100.16:3000/bunny/profile?id=${id}`)
-    const bunny = await res.json()
+    const data = await res.json()
+    const { bunny, posts } = data
+    console.log(posts)
     setBunny(bunny)
+    setPosts(posts)
   }
 
   useEffect(() => {
@@ -111,7 +151,7 @@ export function Profile() {
 
   return (
     <>
-      <MainProfile bunny={bunny} />
+      <MainProfile posts={posts} bunny={bunny} />
     </>
   )
 }

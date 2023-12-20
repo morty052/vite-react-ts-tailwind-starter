@@ -22,7 +22,7 @@ const buttonVariants = cva(
         sm: 'h-8 rounded-md px-3 text-xs',
         lg: 'flex w-full py-4 max-w-sm text-xl rounded-md px-8',
         icon: 'h-9 w-9',
-        hero: 'flex w-full py-4 max-w-sm text-xl rounded-md px-8',
+        hero: 'flex w-full py-4 max-w-md text-xl rounded-md px-8',
       },
     },
     defaultVariants: {

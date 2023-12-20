@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayPicker } from 'react-day-picker'
 
 import { cn } from 'src/lib/utils'
@@ -18,12 +17,12 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         caption: 'flex justify-center pt-1 relative items-center',
         caption_label: 'text-lg font-semibold',
         nav: 'space-x-1 flex items-center',
-        nav_button: cn(
-          buttonVariants({ variant: 'outline' }),
-          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
-        ),
-        nav_button_previous: 'absolute left-1',
-        nav_button_next: 'absolute right-1',
+        // nav_button: cn(
+        //   buttonVariants({ variant: 'outline' }),
+        //   'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+        // ),
+        // nav_button_previous: 'absolute left-1',
+        // nav_button_next: 'absolute right-1',
         table: 'w-full border-collapse space-y-1',
         head_row: 'flex',
         head_cell: 'text-muted-foreground rounded-md w-12 font-normal text-[0.9rem]',
@@ -33,7 +32,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day_range_end: 'day-range-end',
         day_selected:
           'bg-primary text-primary-foreground hover:bg-white hover:text-dark focus:bg-red-300 focus:text-primary-foreground',
-        day_today: ' bg-green-600 text-accent-foreground',
+        // day_today: ' bg-green-600 text-accent-foreground',
         day_outside:
           'day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30',
         day_disabled: 'text-muted-foreground opacity-50',
@@ -42,8 +41,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: ({ ...props }) => '',
+        IconRight: ({ ...props }) => '',
       }}
       {...props}
     />

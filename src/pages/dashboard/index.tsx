@@ -1,5 +1,5 @@
 import { Route, Routes, useLocation } from 'react-router-dom'
-import { BottomNav, Header, RecommendationBar, Sidebar } from 'src/components'
+import { BottomNav, RecommendationBar, Sidebar } from 'src/components'
 import { Bunnies } from '../bunnies'
 import { Profile } from '../profile'
 import { EventsPage, NotificationsPage, UserProfile, DirectMessages, Wallet } from './views'
@@ -16,7 +16,7 @@ function Events({ day }: { day: string | undefined }) {
 
 function DashBoardRoutes() {
   return (
-    <div className="lg:col-span-4">
+    <div className="relative md:col-span-4">
       <Routes>
         <Route path="/" element={<Bunnies />} />
         <Route path="/bunny/:id" element={<Profile />} />
@@ -24,7 +24,7 @@ function DashBoardRoutes() {
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/directmessages" element={<DirectMessages />} />
         <Route path="/profile" element={<UserProfile />} />
-        <Route path="/wallet" element={<Wallet />} />
+        <Route path="/wallet/*" element={<Wallet />} />
       </Routes>
     </div>
   )
@@ -37,11 +37,11 @@ export function DashBoard() {
 
   return (
     <>
-      <Sidebar />
-      {!isDm && <Header />}
-      <div className=" grid-cols-7 pt-20 sm:ml-[96px] lg:ml-64 lg:grid lg:pt-0">
+      {!isDm && <Sidebar />}
+      {/* {!isDm && <Header />} */}
+      <div className={` ${!isDm ? 'grid-cols-7 sm:ml-[96px] md:grid  lg:ml-64' : ''} `}>
         <DashBoardRoutes />
-        <RecommendationBar />
+        {!isDm && <RecommendationBar />}
       </div>
       {!isDm && <BottomNav />}
     </>

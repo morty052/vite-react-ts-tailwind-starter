@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { chatClient } from 'src/hooks/useChatClient'
 import { DefaultGenerics } from 'stream-chat'
-import { Avatar, Channel, Chat, MessageInput, MessageList, Thread, Window } from 'stream-chat-react'
+import { Avatar, Channel, Chat, MessageInput, MessageList, Thread, Window, useChatContext } from 'stream-chat-react'
 import 'stream-chat-react/dist/css/v2/index.css'
-import { Contacts } from './components'
+import { ChatContextWindow, Contacts } from './components'
 
 export function DirectMessages() {
   const [channel, setchannel] = useState<DefaultGenerics | undefined>(undefined)
-  // const { client } = useChatContext()
+
   const { username, loading } = useChatContextParams()
 
   const filters = { members: { $in: [username] } }
@@ -44,16 +44,55 @@ export function DirectMessages() {
   //   createChannel()
   // }, [token])
 
-  const ChatHeader = (props) => {
-    const { contact, avatar } = channel ?? {}
+  const ChatHeader = () => {
+    // const { contact, avatar } = channel ?? {}
+    const { channel } = useChatContext()
+
+    const { data, state } = channel
+
+    const { image, name } = data
 
     return (
-      <div className="flex items-center gap-x-2 p-2">
-        <span onClick={() => setchannel(undefined)}>&#8592;</span>
+      <div className="flex items-center gap-x-2 border-b p-2 ">
+        <span className="sm:hidden" onClick={() => setchannel(undefined)}>
+          &#8592;
+        </span>
         <div className="flex items-center gap-x-2">
-          <Avatar image={avatar} name={contact} />
-          <span>{contact}</span>
+          <Avatar image={image} name={''} />
+          <span className="text-light first-letter:uppercase">{name}</span>
         </div>
+      </div>
+    )
+  }
+
+  function ChatWindow() {
+    if (!channel) {
+      return (
+        <div
+          className={` flex h-screen items-center justify-center  border  sm:col-span-8 lg:col-span-6 ${
+            !channel && 'hidden sm:block'
+          } `}
+        >
+          <div className="flex h-full items-center justify-center border    pb-64">
+            <div className="">
+              <p className="primary-text text-center">No Active channel</p>
+              <p className="text-center text-light">Select a chat to view messages</p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className={`h-screen sm:col-span-8 lg:col-span-6 ${!channel && 'hidden sm:block'}  `}>
+        <Channel>
+          <Window>
+            <ChatHeader />
+            <MessageList />
+            <MessageInput />
+          </Window>
+          <Thread />
+        </Channel>
       </div>
     )
   }
@@ -63,21 +102,16 @@ export function DirectMessages() {
   }
 
   return (
-    <div className="relative -mt-20 flex h-screen flex-col">
-      <Chat theme="str-chat__theme-dark" client={chatClient}>
-        <Contacts username={username} channell={channel} setChannel={setchannel} sort={sort} filters={filters} />
-        {channel && (
-          <Channel>
-            <Window>
-              {/* <ChannelHeader /> */}
-              <ChatHeader />
-              <MessageList />
-              <MessageInput />
-            </Window>
-            <Thread />
-          </Channel>
-        )}
-      </Chat>
+    <div className="">
+      <div className="relative  flex-col    lg:-mt-0">
+        <Chat theme="str-chat__theme-dark" client={chatClient}>
+          <div className=" grid-cols-12  sm:grid">
+            <Contacts username={username} channell={channel} setChannel={setchannel} sort={sort} filters={filters} />
+            <ChatWindow />
+            <ChatContextWindow />
+          </div>
+        </Chat>
+      </div>
     </div>
   )
 }

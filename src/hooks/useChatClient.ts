@@ -3,9 +3,11 @@ import { StreamChat } from 'stream-chat'
 
 export const chatClient = new StreamChat('4tfg8w9fwvvu')
 
-export async function createChat(user: string, newContact: string, bunny_id: string) {
+export async function createChat(user: string, newContact: string, bunny_id: string, image: string) {
   const channel = chatClient.channel('messaging', {
     members: [`${user}`, `${newContact}`],
+    image: image,
+    name: newContact,
   })
 
   const addBunnyToContacts = async () => {

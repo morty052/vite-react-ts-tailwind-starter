@@ -33,9 +33,22 @@ const getUser = async (username, full) => {
   }
 }
 
-export const getAllBunnies = async () => {
+export const getAllBunnies = async (username) => {
+  const user = await getUser(username)
+  const { _id } = user
+  const data = await client.fetch(`*[_type == "bunnies" && references("${_id}")]`)
+
+  if (!data) {
+    console.log('no followers')
+  }
+
+  const following = data.map((bunny) => {
+    return bunny.name
+  })
+
   try {
     const result = await client.fetch('*[_type == "bunnies"]')
+
     const bunnies = result.map((bunny) => {
       return {
         _id: bunny._id,
@@ -44,8 +57,11 @@ export const getAllBunnies = async () => {
         avatar: urlFor(bunny.avatar).url(),
       }
     })
-    console.log('sending bunnies')
-    return bunnies
+    console.log(following)
+    return {
+      following,
+      bunnies,
+    }
   } catch (error) {
     console.log(error)
   }
@@ -72,6 +88,27 @@ export const getRecommendedBunnies = async () => {
 export const getBunny = async (_id) => {
   try {
     const result = await client.fetch(`*[_type == "bunnies" && _id == "${_id}"]`)
+    const postsData = await client.fetch(
+      `*[_type == "posts" && references("${_id}")]{..., author -> {username, name, avatar}}`,
+    )
+    const posts = postsData.map((post) => {
+      const { image: imageUrl, _id, text, likes, likedby, author } = post
+      const { name: authorName, username: authorUsername, avatar } = author
+
+      const image = urlFor(imageUrl).url()
+      const authorAvatar = urlFor(avatar).url()
+
+      return {
+        image,
+        _id,
+        text,
+        likes,
+        likedby,
+        authorName,
+        authorUsername,
+        authorAvatar,
+      }
+    })
     const bunny = result.map((bunny) => {
       const { photos } = bunny
       const reel = photos?.map((photo) => {
@@ -89,26 +126,64 @@ export const getBunny = async (_id) => {
         offers: bunny.offers,
       }
     })
-    return bunny[0]
+    return {
+      bunny: bunny[0],
+      posts,
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getBunnyContext = async (name) => {
+  try {
+    const result = await client.fetch(`*[_type == "bunnies" && name == "${name}"]`)
+    const bunny = result.map((bunny) => {
+      const { photos } = bunny
+      const reel = photos?.map((photo) => {
+        return urlFor(photo).url()
+      })
+      return {
+        _id: bunny._id,
+        name: bunny.name,
+        avatar: urlFor(bunny.avatar).url(),
+        reel,
+        username: bunny.username,
+        recommended: bunny.recommended,
+        bio: bunny.bio,
+        trending: bunny.trending,
+        offers: bunny.offers,
+      }
+    })
+    return {
+      bunny: bunny[0],
+    }
   } catch (error) {
     console.log(error)
   }
 }
 
 export const getUserBunnies = async (username) => {
-  const user = await getUser(username, true)
-  const { bunnies: data } = user
-  const bunnies = data.map((bunnyData) => {
-    const { bunny } = bunnyData
-    const { name, avatar: url } = bunny
-    const avatar = urlFor(url).url()
-    console.log(bunny)
-    return {
-      name,
-      avatar,
+  try {
+    const user = await getUser(username, true)
+    const { bunnies: data } = user
+    if (!data) {
+      return []
     }
-  })
-  return bunnies
+    const bunnies = data.map((bunnyData) => {
+      const { bunny } = bunnyData
+      const { name, avatar: url } = bunny
+      const avatar = urlFor(url).url()
+      console.log(bunny)
+      return {
+        name,
+        avatar,
+      }
+    })
+    return bunnies
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 export const createUser = async (username, email) => {
@@ -116,6 +191,7 @@ export const createUser = async (username, email) => {
     _type: 'users',
     username,
     email,
+    credits: 100,
   }
   try {
     await client.create(user)
@@ -132,6 +208,8 @@ export const likeBunny = async (username, bunny_id) => {
     },
     liked: true,
   }
+  const result = await client.fetch(`*[_type == "bunnies" && _id == "${bunny_id}"]`)
+  const { _id: bunnyToPatch } = result[0]
 
   try {
     const user = await getUser(username)
@@ -141,6 +219,16 @@ export const likeBunny = async (username, bunny_id) => {
       .patch(_id)
       .setIfMissing({ bunnies: [] })
       .insert('after', 'bunnies[-1]', [newBunny])
+      .commit({ autoGenerateArrayKeys: true })
+    await client
+      .patch(bunnyToPatch)
+      .setIfMissing({ followers: [] })
+      .insert('after', 'followers[-1]', [
+        {
+          _type: 'reference',
+          _ref: _id,
+        },
+      ])
       .commit({ autoGenerateArrayKeys: true })
   } catch (error) {
     console.error(error)
@@ -277,7 +365,7 @@ export const getEvents = async (username) => {
     const user = await getUser(username, true)
     const { events: data } = user
     if (!data) {
-      return
+      return []
     }
     const events = data.map((event) => {
       return {
@@ -316,4 +404,54 @@ export const decUserCredits = async (username, amount) => {
   await client.patch(_id).set({ credits: newCredits }).commit()
 
   return newCredits
+}
+
+export const getAllPosts = async () => {
+  try {
+    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id} }`
+    const result = await client.fetch(query)
+    const posts = result.map((post) => {
+      const { author, likes, text, _createdAt, _id } = post
+      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const authorAvatar = urlFor(avatar).url()
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+      }
+    })
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const LikePost = async (post_id, username) => {
+  try {
+    const user = await getUser(username)
+    const { _id } = user
+    const newLike = {
+      _type: 'reference',
+      _ref: _id,
+    }
+
+    console.log(newLike)
+    await client
+      .patch(post_id)
+      .setIfMissing({ likes: 0, likedby: [] })
+      .inc({ likes: 1 })
+      .insert('after', 'likedby[-1]', [newLike])
+      .commit({
+        autoGenerateArrayKeys: true,
+      })
+  } catch (error) {
+    console.log(error)
+  }
 }

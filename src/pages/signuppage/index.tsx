@@ -1,21 +1,10 @@
-import { useSignUp } from '@clerk/clerk-react'
-import { useState } from 'react'
-import { Button } from 'src/components/ui/button'
-
-async function createNewUser(email: string, username: string) {
-  const res = await fetch(`http://192.168.100.16:3000/users/create?email=${email}&username=${username}`)
-  const data = await res.json()
-  const { error } = data
-
-  if (!error) {
-    console.log('user created')
-  } else console.error('something went wrong')
-}
-
 export function SignUpPage() {
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [pendingVerification, setpendingVerification] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [onboarding, setOnboarding] = useState(false)
 
   const { isLoaded, signUp, setActive } = useSignUp()
 
@@ -28,31 +17,62 @@ export function SignUpPage() {
     e.preventDefault()
     // Check the sign up response to
     // decide what to do next.
-    await signUp
-      .create({
+
+    try {
+      await signUp.create({
         emailAddress,
         password,
         username,
       })
-      .then((result) => {
-        if (result.status === 'complete') {
-          console.log(result)
-          setActive({ session: result.createdSessionId })
-        } else {
-          console.log(result)
-        }
+      await signUp?.prepareEmailAddressVerification({
+        strategy: 'email_code',
       })
-      .catch((err) => console.error('error', err.errors[0].longMessage))
+      setpendingVerification(true)
+    } catch (err) {
+      console.error('error', err.errors[0].longMessage)
+    }
 
-    await createNewUser(emailAddress, username)
+    // await createNewUser(emailAddress, username)
+  }
+
+  async function verifyOtp() {
+    try {
+      const result = await signUp?.attemptVerification({
+        strategy: 'email_code',
+        code: otp,
+      })
+      console.log('verified')
+      // setActive({ session: })
+      console.log(result?.createdUserId)
+      setActive({ session: result?.createdSessionId })
+      window.location.replace(`/onboarding/${result?.createdUserId}`)
+    } catch (err) {
+      console.error('error', err.errors[0].longMessage)
+    }
   }
 
   return (
     <div className="">
-      <input value={username} onChange={(e) => setUsername(e.target.value)} type="text" />
-      <input value={emailAddress} onChange={(e) => setEmailAddress(e.target.value)} type="text" />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} type="text" />
-      <Button onClick={(e) => submit(e)}>Submit</Button>
+      {!pendingVerification && (
+        <div className="flex flex-col gap-y-4">
+          <input className="border" value={username} onChange={(e) => setUsername(e.target.value)} type="text" />
+          <input
+            className="border"
+            value={emailAddress}
+            onChange={(e) => setEmailAddress(e.target.value)}
+            type="text"
+          />
+          <input className="border" value={password} onChange={(e) => setPassword(e.target.value)} type="text" />
+          <Button onClick={(e) => submit(e)}>Submit</Button>
+        </div>
+      )}
+      {pendingVerification && (
+        <div className="flex flex-col gap-y-4">
+          <input className="border bg-transparent" value={otp} onChange={(e) => setOtp(e.target.value)} type="text" />
+          <p className="primary-text text-center">Check your email</p>
+          <Button onClick={() => verifyOtp()}>Confirm</Button>
+        </div>
+      )}
     </div>
   )
 }

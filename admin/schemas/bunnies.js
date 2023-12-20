@@ -26,7 +26,7 @@ export default {
     {
       name: 'bio',
       title: 'Bio',
-      type: 'string',
+      type: 'text',
     },
     {
       name: 'location',
@@ -80,6 +80,17 @@ export default {
         {
           type: 'reference',
           to: [{type: 'users'}],
+        },
+      ],
+    },
+    {
+      name: 'posts',
+      title: 'Posts',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'posts'}],
         },
       ],
     },

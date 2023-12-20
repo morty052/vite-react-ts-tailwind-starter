@@ -1,21 +1,21 @@
-.str-chat__channel-list {
-  width: 100%;
+/* .str-chat__channel-list {
+  @apply rounded-l-lg;
 }
 .str-chat__channel {
-  width: 100%;
-}
+  @apply rounded-tr-lg;
+} */
 .str-chat__thread {
   width: 45%;
 }
 
-/* .str-chat__container {
-  @apply bg-red-300;
+.str-chat__container {
+  @apply bg-none;
 }
 
 .str-chat__main-panel {
-  @apply w-10 bg-red-300;
-} */
+  @apply w-10 bg-none;
+}
 
 .str-chat__message-input {
-  @apply fixed bottom-0 w-full;
+  @apply absolute bottom-0 w-full;
 }

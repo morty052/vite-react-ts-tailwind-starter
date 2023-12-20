@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { bunnyRouter, chatRoutes, userRoutes } from './routes/index.js'
+import { bunnyRouter, chatRoutes, userRoutes, postRoutes } from './routes/index.js'
 
 const app = express()
 app.use(
@@ -14,6 +14,7 @@ app.use(express.json())
 app.use('/bunny', bunnyRouter)
 app.use('/chat', chatRoutes)
 app.use('/users', userRoutes)
+app.use('/posts', postRoutes)
 
 app.listen(3000, () => {
   console.log('Server running on port 3000')
