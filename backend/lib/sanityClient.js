@@ -408,18 +408,22 @@ export const decUserCredits = async (username, amount) => {
 
 export const getAllPosts = async () => {
   try {
-    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id} }`
+    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id}, likedby[]->{username}}`
     const result = await client.fetch(query)
     const posts = result.map((post) => {
-      const { author, likes, text, _createdAt, _id } = post
+      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
       const { name, avatar, username: authorUsername, _id: author_id } = author
       const authorAvatar = urlFor(avatar).url()
+      const likedBy = likedByData?.map((likedBy) => {
+        return likedBy.username
+      })
 
       return {
         _id,
         text,
         image: urlFor(post.image).url(),
         likes,
+        likedBy,
         authorAvatar,
         authorName: name,
         authorUsername,
@@ -429,7 +433,41 @@ export const getAllPosts = async () => {
     })
     return posts
   } catch (error) {
-    console.log(error)
+    console.error(error)
+  }
+}
+
+export const getPostsFromFollowing = async (username) => {
+  try {
+    const user = await getUser(username)
+    const { _id } = user
+    const query = `*[_type == "bunnies" && references("${_id}")]{..., posts[]->{...,author->{name, avatar, username, _id}, likedby[]->{username}}}`
+    const result = await client.fetch(query)
+    const postData = result?.map((bunny) => bunny.posts).flat()
+    const posts = postData?.map((post) => {
+      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
+      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const authorAvatar = urlFor(avatar).url()
+      const likedBy = likedByData?.map((likedBy) => {
+        return likedBy.username
+      })
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        likedBy,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+      }
+    })
+    return posts
+  } catch (error) {
+    console.error(error)
   }
 }
 

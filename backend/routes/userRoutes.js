@@ -13,19 +13,24 @@ import { updateAuthUsername } from '../lib/clerk.js'
 
 export const userRoutes = express.Router()
 
-const data = {
-  name: 'The Human Fund',
-  description: 'Money For People',
-  pricing_type: 'fixed_price',
-  local_price: {
-    amount: 100,
-    currency: 'USD',
-  },
-}
-
 const API_KEY = 'fd0a25a3-ba0a-4bec-9ef0-c40fe1533eb1'
 
-const createCharge = async () => {
+/**
+ * Creates a charge with the specified amount.
+ *
+ * @param {number} amount - The amount to be added to the account.
+ * @return {Promise} - A promise that resolves with the response data from the API.
+ */
+const createCharge = async (amount) => {
+  const data = {
+    name: `Add Funds to wallet`,
+    description: `Funds will be added to your account immediately after payment confirmation.`,
+    pricing_type: 'fixed_price',
+    local_price: {
+      amount,
+      currency: 'USD',
+    },
+  }
   const response = await fetch('https://api.commerce.coinbase.com/charges/', {
     method: 'POST',
     headers: {
@@ -160,11 +165,11 @@ userRoutes.get('/orders', async (req, res) => {
 
 userRoutes.get('/create-charge', async (req, res) => {
   const params = req.query
-  const { username } = params
+  const { amount } = params
 
   console.log('charge request received')
 
-  const charge = await createCharge()
+  const charge = await createCharge(amount)
 
   const data = charge.data
 

@@ -1,11 +1,37 @@
 import React, { useMemo, useState } from 'react'
 import { Link2, MoreVertical, Search, X } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 
 interface IheaderProps {
   isProfile: boolean
   bunnyName: string
   base: boolean
+}
+
+const MenuDropDown = ({ name }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <MoreVertical color="white" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>{name}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem> Settings </DropdownMenuItem>
+        <DropdownMenuItem>Notifications</DropdownMenuItem>
+        <DropdownMenuItem>Contact us</DropdownMenuItem>
+        {/* <DropdownMenuItem>Subscription</DropdownMenuItem> */}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
 
 const SearchResult = ({ avatar, name, username, _id }) => {
@@ -67,7 +93,7 @@ const SearchInput = ({
 const DefaultHeader = ({ bunnies }) => {
   const [searching, setSearching] = useState(false)
   return (
-    <div className="sticky inset-x-0 top-0 z-10 border-b border-white/20 bg-black shadow-lg shadow-white/10 ">
+    <div className="sticky inset-x-0 top-0 z-10 border-b border-white/20 bg-black  ">
       <div className="flex items-center justify-between px-2 py-4">
         {searching && <SearchInput bunnies={bunnies} setSearching={setSearching} />}
         {!searching && (
@@ -75,7 +101,7 @@ const DefaultHeader = ({ bunnies }) => {
             <p className="primary-text">Bunnies</p>
             <div className="flex flex-row items-center gap-x-2 ">
               <Search className="md:hidden" onClick={() => setSearching(!searching)} color="white" />
-              <MoreVertical color="white" />
+              <MenuDropDown name="Menu" />
             </div>
           </>
         )}

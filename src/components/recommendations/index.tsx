@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { Button } from '../ui/button'
 import { EventBooker } from '../eventbooker'
@@ -67,7 +67,8 @@ const SearchBar = ({ bunnies }) => {
   )
 }
 
-const ReccomendationCard = ({ name, avatar, username }: ReccomendationCardProps) => {
+const ReccomendationCard = ({ name, avatar, username, _id }: ReccomendationCardProps) => {
+  const navigate = useNavigate()
   const MenuButton = () => {
     return (
       <div className="absolute right-0 top-2 flex justify-end ">
@@ -92,6 +93,7 @@ const ReccomendationCard = ({ name, avatar, username }: ReccomendationCardProps)
     <div className="relative min-h-[128px]  w-full max-w-sm rounded-md border  ">
       <MenuButton />
       <img
+        onClick={() => navigate(`/dashboard/bunny/${_id}`)}
         className="absolute bottom-2 left-2 z-10 h-24 w-24 rounded-full border-2 object-cover"
         src="https://cdn.sanity.io/images/i7m1o5ma/production/106cbd4ddf628480eb902a8f2473f032f162aa6c-1038x1280.jpg"
         alt=""
@@ -101,7 +103,10 @@ const ReccomendationCard = ({ name, avatar, username }: ReccomendationCardProps)
         src="https://cdn.sanity.io/images/i7m1o5ma/production/a3506418e9de9bce024f9fcc9828d5fa96c381d9-1032x1280.jpg"
         alt=""
       />
-      <div className="absolute inset-x-0 bottom-0 top-[60%] flex justify-end bg-black/50 px-2 ">
+      <div
+        onClick={() => navigate(`/dashboard/bunny/${_id}`)}
+        className="absolute inset-x-0 bottom-0 top-[60%] flex justify-end bg-black/50 px-2 "
+      >
         <div className="">
           <p className="font-semibold text-light">{name}</p>
           <p className="text-xs text-light">@{username}</p>
@@ -148,7 +153,6 @@ export function RecommendationBar() {
   const isProfile = path.includes('bunny')
 
   const bunny_id = useLocation().pathname.replace('/dashboard/bunny/', '')
-  console.log(bunny_id)
 
   async function getRecommended() {
     const res = await fetch('http://192.168.100.16:3000/bunny/recommended')
@@ -173,8 +177,8 @@ export function RecommendationBar() {
   }, [username])
 
   return (
-    <div className=" col-span-3  hidden min-h-screen space-y-4 border-l bg-black px-2 md:block">
-      <div className="sticky top-0 flex flex-col items-center gap-y-2 py-4">
+    <div className=" hidden  min-h-screen space-y-4  border-l border-white/10  pl-2 lg:block">
+      <div className="  flex flex-col items-center gap-y-2 py-4">
         {!isProfile && <SearchBar bunnies={bunnies} />}
         {isProfile && <SubscriptionStatus />}
         {isProfile && <EventBooker bunny_id={bunny_id} />}

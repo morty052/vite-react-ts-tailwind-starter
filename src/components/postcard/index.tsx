@@ -1,10 +1,11 @@
-import { ArrowRight, ChevronDown, ChevronUp, CircleDollarSign, Heart, UserPlus } from 'lucide-react'
+import { ArrowRight, Bookmark, ChevronDown, ChevronUp, CircleDollarSign, Heart, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { createChat } from 'src/hooks/useChatClient'
 import { Button } from '../ui/button'
 import { Dialog, DialogContent } from '../ui/dialog'
+import { useToast } from '../ui/use-toast'
 
 export type PostCardProps = {
   image: string
@@ -53,6 +54,7 @@ function TippingModal({ open, setOpen, eventName, avatar }) {
   const [insufficientBalance, setInsufficientBalance] = useState(false)
 
   const { username } = useChatContextParams()
+  const { toast } = useToast()
 
   const checkBalance = async (purchaseAmount: number) => {
     const balanceRequest = await fetch(`http://192.168.100.16:3000/users/credits?username=${username}`)
@@ -71,6 +73,10 @@ function TippingModal({ open, setOpen, eventName, avatar }) {
   async function confirmTip() {
     await checkBalance(tip)
     setOpen(false)
+    toast({
+      title: 'Tip Sent ✅',
+      description: 'Tip Sent',
+    })
   }
   const EventConfirmation = () => {
     return (
@@ -118,16 +124,16 @@ export function PostCard(props: PostCardProps) {
   const navigation = useNavigate()
   const { username: user } = useChatContextParams()
 
-  const isFollowing = likedBy?.includes(authorName)
+  const isLiked = likedBy?.includes(user)
 
   function handleViewProfile() {
     navigation(`/dashboard/bunny/${author_id}`)
   }
 
   async function handleLikePost() {
+    setLiked(likes + 1)
     const res = await fetch(`http://192.168.100.16:3000/posts/like?username=${user}&post_id=${_id}`)
     const data = await res.json()
-    setLiked(likes + 1)
   }
 
   function handleAddBunny() {
@@ -137,14 +143,14 @@ export function PostCard(props: PostCardProps) {
   const PostImage = () => {
     return (
       <div className="">
-        <img className="h-[300px]  w-full rounded-lg  object-cover" src={image} alt="" />
+        <img className=" h-[359px] w-full  object-cover  " src={image} alt="" />
       </div>
     )
   }
 
   const PostInfo = () => {
     return (
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-2">
         <div className="flex items-start gap-x-2">
           <button onClick={handleViewProfile} className="grid  place-content-center  ">
             <img className="h-12 w-12 rounded-full border-2 border-white object-cover" src={authorAvatar} alt="" />
@@ -167,16 +173,21 @@ export function PostCard(props: PostCardProps) {
 
   const PostButtons = () => {
     return (
-      <div className="flex items-center justify-between">
-        <div className="flex gap-x-4">
-          <div onClick={handleLikePost} className="flex items-center gap-x-1">
-            <Heart size={28} fill={isFollowing ? 'red' : 'white'} color="red" />
-            <p className="text-sm text-light">{!liked ? likes : liked}</p>
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-x-6">
+          <div className="flex gap-x-4">
+            <div onClick={handleLikePost} className="flex cursor-pointer items-center gap-x-1">
+              <Heart size={28} fill={isLiked || liked ? 'red' : 'white'} color="red" />
+              <p className="text-sm text-light">{!liked ? likes : liked}</p>
+            </div>
           </div>
+          <button onClick={handleTipModal} className="flex gap-x-2">
+            <CircleDollarSign size={28} color="white" />
+            <span className="text-light">Tip</span>
+          </button>
         </div>
-        <button onClick={handleTipModal} className="flex gap-x-2">
-          <CircleDollarSign size={28} color="white" />
-          <span className="text-light">Tip</span>
+        <button onClick={handleTipModal} className="">
+          <Bookmark size={28} color="white" />
         </button>
       </div>
     )
@@ -184,15 +195,15 @@ export function PostCard(props: PostCardProps) {
 
   const PostText = () => {
     return (
-      <div className=" w-[90%]">
+      <div className=" w-[90%] px-2">
         <p className="font-li text-lg text-light">{text}</p>
       </div>
     )
   }
 
   return (
-    <div className="border-y ">
-      <div className="mx-auto max-w-lg  space-y-4 px-2 py-6">
+    <div className="border-b  border-white/10 ">
+      <div className="mx-auto   space-y-4  py-6">
         <PostInfo />
         <PostText />
         <PostImage />

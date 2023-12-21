@@ -69,8 +69,8 @@ export function DirectMessages() {
     if (!channel) {
       return (
         <div
-          className={` flex h-screen items-center justify-center  border  sm:col-span-8 lg:col-span-6 ${
-            !channel && 'hidden sm:block'
+          className={` flex h-screen items-center justify-center  border  sm:col-span-8 xl:col-span-6  ${
+            !channel && 'hidden lg:block'
           } `}
         >
           <div className="flex h-full items-center justify-center border    pb-64">
@@ -84,7 +84,7 @@ export function DirectMessages() {
     }
 
     return (
-      <div className={`h-screen sm:col-span-8 lg:col-span-6 ${!channel && 'hidden sm:block'}  `}>
+      <div className={`col-span-8 h-screen xl:col-span-6   ${!channel && 'hidden lg:block'}  `}>
         <Channel>
           <Window>
             <ChatHeader />
@@ -102,16 +102,14 @@ export function DirectMessages() {
   }
 
   return (
-    <div className="">
-      <div className="relative  flex-col    lg:-mt-0">
-        <Chat theme="str-chat__theme-dark" client={chatClient}>
-          <div className=" grid-cols-12  sm:grid">
-            <Contacts username={username} channell={channel} setChannel={setchannel} sort={sort} filters={filters} />
-            <ChatWindow />
-            <ChatContextWindow />
-          </div>
-        </Chat>
-      </div>
+    <div className="relative    lg:-mt-0">
+      <Chat theme="str-chat__theme-dark" client={chatClient}>
+        <div className="grid-cols-12 lg:grid">
+          <Contacts username={username} channell={channel} setChannel={setchannel} sort={sort} filters={filters} />
+          <ChatWindow />
+          <ChatContextWindow />
+        </div>
+      </Chat>
     </div>
   )
 }

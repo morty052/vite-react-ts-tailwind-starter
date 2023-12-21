@@ -39,14 +39,14 @@ function Event({ event }: { event: Event }) {
 
     switch (eventtype) {
       case 'DATE':
-        icon = <Table size={28} color="white" />
+        icon = <Table size={38} color="white" />
         break
       case 'PHOTO':
-        icon = <Camera size={28} color="white" />
+        icon = <Camera size={38} color="white" />
 
         break
       case 'VIDEO':
-        icon = <Video size={28} color="white" />
+        icon = <Video size={38} color="white" />
         break
       default:
         break

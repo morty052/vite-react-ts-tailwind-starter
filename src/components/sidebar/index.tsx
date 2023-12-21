@@ -6,27 +6,27 @@ const sidebarLinks = [
   {
     name: 'Home',
     path: '/dashboard',
-    icon: <RabbitIcon size={28} />,
+    icon: <RabbitIcon size={34} />,
   },
   {
     name: 'events',
     path: 'calendar',
-    icon: <Calendar size={28} />,
+    icon: <Calendar size={34} />,
   },
   {
     name: 'messages',
     path: 'directmessages',
-    icon: <MessageCircleIcon size={28} />,
+    icon: <MessageCircleIcon size={34} />,
   },
   {
     name: 'profile',
     path: 'profile',
-    icon: <UserCircle size={28} />,
+    icon: <UserCircle size={34} />,
   },
   {
     name: 'wallet',
     path: 'wallet',
-    icon: <Wallet size={28} />,
+    icon: <Wallet size={34} />,
   },
 ]
 
@@ -52,12 +52,12 @@ const SidebarHeader = () => {
   }
 
   return (
-    <div className="mb-4 justify-center space-y-4 lg:w-full ">
-      <div className="items-center  justify-between lg:flex lg:px-2  ">
+    <div className="mb-4 justify-center space-y-4 xl:w-full ">
+      <div className="items-center  justify-between lg:px-2 xl:flex  ">
         <UserAvatar />
-        <div className="hidden lg:block">
+        {/* <div className="hidden xl:block">
           <UserTokens />
-        </div>
+        </div> */}
       </div>
     </div>
   )
@@ -65,24 +65,24 @@ const SidebarHeader = () => {
 
 const SidebarLink = ({ name, path, icon }: { name: string; path: string; icon: React.ReactNode }) => {
   return (
-    <Link to={path} className=" items-center gap-x-4 lg:flex">
-      <div className="grid h-12 w-12 place-content-center rounded-full border border-red-400">{icon}</div>
-      <span className="hidden flex-1 lg:block">{name}</span>
+    <Link to={path} className=" items-center gap-x-4 xl:flex">
+      <div className="grid h-12 w-12 place-content-center rounded-full ">{icon}</div>
+      <span className="hidden flex-1 text-xl font-semibold xl:block">{name}</span>
     </Link>
   )
 }
 
 const SignOutButton = () => {
   return (
-    <button className="ml-2 mt-10 grid h-12 w-12 place-content-center rounded-full border border-red-400">
-      <LogOutIcon />
+    <button className="ml-2 mt-10 grid h-12 w-12 place-content-center rounded-full ">
+      <LogOutIcon size={34} />
     </button>
   )
 }
 
 const SidebarLinksContainer = () => {
   return (
-    <div className="flex flex-col gap-y-10 px-2  pt-4 lg:items-start">
+    <div className="flex flex-col gap-y-10  px-2  pt-4 xl:items-start">
       {sidebarLinks.map((link) => (
         <SidebarLink key={link.name} name={link.name} path={link.path} icon={link.icon} />
       ))}
@@ -92,8 +92,8 @@ const SidebarLinksContainer = () => {
 
 export function Sidebar() {
   return (
-    <div className="fixed inset-y-0 left-0 z-20 hidden w-24 border-r bg-black sm:block lg:w-64">
-      <div className="flex flex-col  items-center pt-4 text-light lg:items-start ">
+    <div className="hidden min-h-screen w-24 border-r border-white/10 sm:block    xl:w-72  ">
+      <div className="flex flex-col items-center  pt-4 text-light xl:items-start ">
         <SidebarHeader />
         <SidebarLinksContainer />
         <SignOutButton />

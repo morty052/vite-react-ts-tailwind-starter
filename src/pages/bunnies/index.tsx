@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { likeBunny } from './features'
 import { Header, PostCard, PostCardProps } from 'src/components'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'src/components/ui/tabs'
 
 interface BunnyCardProps {
   username: string
@@ -11,6 +12,68 @@ interface BunnyCardProps {
   _id: string
   _ref: string
   following: string[]
+}
+
+const BunnyTabs = () => {
+  const [following, setFollowing] = useState([])
+  const [posts, setPosts] = useState([])
+
+  const { username } = useChatContextParams()
+
+  async function getPosts() {
+    const res = await fetch(`http://192.168.100.16:3000/posts?username=${username}`)
+    const data = await res.json()
+    const { posts, postsFromFollowing } = data
+    console.log(postsFromFollowing)
+    setFollowing(postsFromFollowing)
+    setPosts(posts)
+  }
+
+  useEffect(() => {
+    if (!username) {
+      return
+    }
+    getPosts()
+  }, [username])
+
+  return (
+    <Tabs defaultValue="foryou" className=" w-full">
+      <TabsList className="flex bg-transparent">
+        <TabsTrigger className=" tab_trigger data-[state=active]:text-white " value="foryou">
+          For You
+        </TabsTrigger>
+        <TabsTrigger className="tab_trigger data-[state=active]:text-white " value="following">
+          Following
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent className="" value="foryou">
+        <div className="pb-10">
+          {posts.map((post: PostCardProps, index) => {
+            return (
+              <div key={index} className="">
+                <PostCard {...post} />
+              </div>
+            )
+          })}
+        </div>
+      </TabsContent>
+      <TabsContent value="following">
+        {following.length > 0 ? (
+          <div className="pb-10">
+            {following.map((post: PostCardProps, index: number) => {
+              return (
+                <div key={index} className="">
+                  <PostCard {...post} />
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="primary-text">Not following yet</p>
+        )}
+      </TabsContent>
+    </Tabs>
+  )
 }
 
 function BunnyCard({ username, avatar, _id, following }: BunnyCardProps) {
@@ -73,8 +136,6 @@ function BunnySorter(params: type) {
 
 export function Bunnies() {
   const [bunnies, setBunnies] = useState([])
-  const [following, setFollowing] = useState([])
-  const [posts, setPosts] = useState([])
 
   const { username } = useChatContextParams()
 
@@ -85,8 +146,11 @@ export function Bunnies() {
     setFollowing(bunnies.following)
   }
   async function getPosts() {
-    const res = await fetch(`http://192.168.100.16:3000/posts`)
-    const posts = await res.json()
+    const res = await fetch(`http://192.168.100.16:3000/posts?username=${username}`)
+    const data = await res.json()
+    const { posts, postsFromFollowing } = data
+    console.log(postsFromFollowing)
+    setFollowing(postsFromFollowing)
     setPosts(posts)
   }
 
@@ -95,29 +159,17 @@ export function Bunnies() {
       return
     }
     getBunnies()
-    getPosts()
   }, [username])
+
+  if (!bunnies) {
+    return null
+  }
 
   return (
     <>
       <div className="pb-14 ">
         <Header bunnies={bunnies} base />
-        {/* {bunnies?.map((bunny: any) => {
-          return (
-            <BunnyCard
-              following={following}
-              key={bunny._id}
-              _ref={bunny._ref}
-              _id={bunny._id}
-              username={bunny.name}
-              avatar={bunny.avatar}
-            />
-          )
-        })} */}
-
-        {posts?.map((post: PostCardProps) => {
-          return <PostCard key={post._id} {...post} />
-        })}
+        <BunnyTabs />
       </div>
     </>
   )

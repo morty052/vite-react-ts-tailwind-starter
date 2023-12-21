@@ -122,7 +122,7 @@ export function Contacts(props: ContactsProps) {
 
   return (
     <>
-      <div className={`sm:col-span-4 lg:col-span-3 ${channell && 'hidden sm:block'}`}>
+      <div className={`col-span-4 xl:col-span-3 ${channell && 'hidden lg:block'}`}>
         <ChannelList
           EmptyStateIndicator={NoContactScreens}
           List={CustomList}

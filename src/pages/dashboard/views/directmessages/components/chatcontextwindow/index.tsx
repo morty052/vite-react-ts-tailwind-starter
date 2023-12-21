@@ -53,22 +53,11 @@ export function ChatContextWindow() {
   }, [channel])
 
   if (!channel) {
-    return <div className="col-span-3 hidden h-screen overflow-scroll border px-2 lg:block"></div>
+    return <div className="col-span-2 hidden h-screen overflow-scroll border px-2 xl:block"></div>
   }
 
   return (
-    <div className="col-span-3 hidden h-screen overflow-scroll border px-2 lg:block">
-      {/* <p className="primary-text text-center">Reel</p>
-
-      <div className="space-y-4 ">
-        {reel?.map((image, index) => {
-          return (
-            <div key={index} className="mx-auto w-[95%]">
-              <img className="w-full rounded-lg object-cover" src={image} alt="" />
-            </div>
-          )
-        })}
-      </div> */}
+    <div className="col-span-3 hidden  h-screen overflow-scroll border px-2 xl:block">
       <ContextTabs reel={reel} />
     </div>
   )
