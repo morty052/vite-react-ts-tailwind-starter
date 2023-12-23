@@ -49,6 +49,19 @@ export default {
       ],
     },
     {
+      name: 'bookmarked',
+      title: 'bookmarked',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          name: 'bookmarks',
+          title: 'Bookmarks',
+          to: [{type: 'posts'}],
+        },
+      ],
+    },
+    {
       name: 'events',
       title: 'Events',
       type: 'array',

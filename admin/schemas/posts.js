@@ -40,5 +40,16 @@ export default {
         },
       ],
     },
+    {
+      name: 'bookmarkers',
+      title: 'Bookmarkers',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: {type: 'users'},
+        },
+      ],
+    },
   ],
 }

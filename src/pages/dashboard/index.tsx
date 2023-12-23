@@ -92,7 +92,7 @@ export function DashBoard() {
 
   const { isLoading, error, data: bunniesData } = useQuery({ queryKey: ['bunnies'], queryFn: Init })
 
-  const { events, bunnies, postsFromFollowing, posts, recommended } = bunniesData ?? {}
+  const { bunnies, postsFromFollowing, posts, recommended } = bunniesData ?? {}
 
   // useEffect(() => {
   //   if (!username) {
@@ -110,7 +110,7 @@ export function DashBoard() {
       <Route element={<DashBoardLayout recommended={recommended} bunnies={bunnies} />}>
         <Route path="/" element={<Bunnies posts={posts} following={postsFromFollowing} bunnies={bunnies} />} />
         <Route path="/bunny/:id" element={<Profile bunnies={bunnies} username={username} />} />
-        <Route path="/calendar" element={<EventsPage events={events} />} />
+        <Route path="/calendar" element={<EventsPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/wallet/*" element={<Wallet />} />

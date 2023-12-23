@@ -375,7 +375,8 @@ export function Wallet() {
   const { username } = useChatContextParams()
 
   const getUserCredits = async () => {
-    const balanceRequest = await fetch(`http://192.168.100.16:3000/users/credits?username=${username}`)
+    const _id = localStorage.getItem('_id')
+    const balanceRequest = await fetch(`http://192.168.100.16:3000/users/credits?_id=${_id}`)
     const balanceData = await balanceRequest.json()
     const { credits } = balanceData
     return credits

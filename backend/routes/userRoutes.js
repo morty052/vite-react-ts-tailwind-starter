@@ -10,6 +10,7 @@ import {
   getOrders,
   getUserBunnies,
   init,
+  getUserById,
 } from '../lib/sanityClient.js'
 import { updateAuthUsername } from '../lib/clerk.js'
 
@@ -69,6 +70,20 @@ userRoutes.get('/create', async (req, res) => {
   })
 })
 
+userRoutes.get('/fetch-user', async (req, res) => {
+  const params = req.query
+  const { _id } = params
+
+  const user = await getUserById(_id)
+
+  res.send({
+    message: 'User fetched',
+    success: true,
+    error: false,
+    user,
+  })
+})
+
 userRoutes.get('/likebunny', async (req, res) => {
   const params = req.query
   const { username, bunny_id } = params
@@ -125,9 +140,9 @@ userRoutes.get('/events', async (req, res) => {
 
 userRoutes.get('/credits', async (req, res) => {
   const params = req.query
-  const { username } = params
+  const { _id } = params
 
-  const credits = await getUserCredits(username)
+  const credits = await getUserCredits(_id)
 
   res.send({
     message: 'created',

@@ -151,8 +151,6 @@ export const getBunny = async (_id, username) => {
 
     const isFollowing = bunny[0].followers.includes(username)
 
-    console.log(`${username} is  ${isFollowing ? 'following' : 'not following'}  ${bunny[0].name}`)
-
     return {
       bunny: bunny[0],
       posts,
@@ -282,6 +280,50 @@ export const likeBunny = async (username, bunny_id) => {
       .patch(bunnyToPatch)
       .setIfMissing({ followers: [] })
       .insert('after', 'followers[-1]', [
+        {
+          _type: 'reference',
+          _ref: _id,
+        },
+      ])
+      .commit({ autoGenerateArrayKeys: true })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const bookmarkPost = async (_id, post_id) => {
+  const newPost = {
+    _type: 'bookmarks',
+    _ref: post_id,
+  }
+  const result = await client.fetch(`*[_type == "posts" && _id == "${post_id}"]{..., bookmarkers[] -> {_id}}`)
+  const bookMarks = result
+    .map((post) => {
+      return post.bookmarkers
+    })
+    .flat()
+    .map((post) => post._id)
+
+  const isBookmarked = bookMarks.includes(_id)
+
+  if (isBookmarked) {
+    console.info('Already bookmarked')
+    return
+  }
+
+  try {
+    console.log(post_id)
+    await client
+      .patch(_id)
+      .setIfMissing({ bookmarked: [] })
+      .insert('after', 'bookmarked[-1]', [newPost])
+      .commit({ autoGenerateArrayKeys: true })
+
+    // TODO: iMPLEMENT ADDING BOOKMARKS TO POSTS DATABASE
+    await client
+      .patch(post_id)
+      .setIfMissing({ bookmarkers: [] })
+      .insert('after', 'bookmarkers[-1]', [
         {
           _type: 'reference',
           _ref: _id,
@@ -441,8 +483,8 @@ export const getEvents = async (_id) => {
   }
 }
 
-export const getUserCredits = async (username) => {
-  const user = await getUser(username)
+export const getUserCredits = async (_id) => {
+  const user = await getUserById(_id)
   const { credits } = user
   return credits
 }
@@ -465,17 +507,30 @@ export const decUserCredits = async (username, amount) => {
   return newCredits
 }
 
-export const getAllPosts = async () => {
+export const getAllPosts = async (user_id) => {
   try {
-    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id}, likedby[]->{username}}`
+    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{username}, bookmarkers[] -> {_id}}`
     const result = await client.fetch(query)
+
     const posts = result.map((post) => {
-      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
-      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const { author, likes, text, _createdAt, _id, likedby: likedByData, bookmarkers } = post
+      const { name, avatar, username: authorUsername, _id: author_id, followers: authorFollowers } = author
       const authorAvatar = urlFor(avatar).url()
       const likedBy = likedByData?.map((likedBy) => {
         return likedBy.username
       })
+
+      const bookMarks = bookmarkers?.map((post) => {
+        return post._id
+      })
+
+      const followers = authorFollowers?.map((follower) => {
+        return follower._id
+      })
+
+      const isFollowing = followers?.includes(user_id)
+
+      const isBookmarked = bookMarks?.includes(user_id)
 
       return {
         _id,
@@ -488,8 +543,13 @@ export const getAllPosts = async () => {
         authorUsername,
         author_id,
         time: _createdAt,
+        isBookmarked: isBookmarked || false,
+        isFollowing: isFollowing || false,
       }
     })
+
+    console.log(posts)
+
     return posts
   } catch (error) {
     console.error(error)
@@ -555,7 +615,6 @@ export const LikePost = async (post_id, username) => {
 
 export const init = async (_id) => {
   try {
-    console.log(_id)
     const user = await getUserById(_id, true)
 
     const { events: userEvents, username } = user
