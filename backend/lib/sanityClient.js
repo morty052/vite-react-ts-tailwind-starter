@@ -24,8 +24,30 @@ export const urlFor = (source) => {
 const getUser = async (username, full) => {
   try {
     const query = full
-      ? `*[_type == "users" && username == "${username}"]{...,bunnies[]{bunny -> {avatar, name} },orders[]{..., bunny-> {avatar, name}},events[]{...,bunny -> {avatar, name}}}`
+      ? `*[_type == "users" && username == "${username}"]{...,bunnies[]{bunny -> {avatar, name} },orders[]{..., bunny-> {avatar, name}},events[]{...,bunny -> {avatar, name, username, _id}}}`
       : `*[_type == "users" && username == "${username}"]`
+    const result = await client.fetch(query)
+    return result[0]
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const getUserId = async (username, full) => {
+  try {
+    const query = `*[_type == "users" && username == "${username}"]`
+    const result = await client.fetch(query)
+    const id = result[0]._id
+    return id
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getUserById = async (_id, full) => {
+  try {
+    const query = full
+      ? `*[_type == "users" && _id == "${_id}"]{...,bunnies[]{bunny -> {avatar, name} },orders[]{..., bunny-> {avatar, name}},events[]{...,bunny -> {avatar, name, username, _id}}}`
+      : `*[_type == "users" && _id == "${_id}"]`
     const result = await client.fetch(query)
     return result[0]
   } catch (error) {
@@ -57,7 +79,6 @@ export const getAllBunnies = async (username) => {
         avatar: urlFor(bunny.avatar).url(),
       }
     })
-    console.log(following)
     return {
       following,
       bunnies,
@@ -78,16 +99,15 @@ export const getRecommendedBunnies = async () => {
         avatar: urlFor(bunny.avatar).url(),
       }
     })
-    console.log('sending bunnies')
     return bunnies
   } catch (error) {
     console.log(error)
   }
 }
 
-export const getBunny = async (_id) => {
+export const getBunny = async (_id, username) => {
   try {
-    const result = await client.fetch(`*[_type == "bunnies" && _id == "${_id}"]`)
+    const result = await client.fetch(`*[_type == "bunnies" && _id == "${_id}"]{...,followers[] -> {username}}`)
     const postsData = await client.fetch(
       `*[_type == "posts" && references("${_id}")]{..., author -> {username, name, avatar}}`,
     )
@@ -110,7 +130,8 @@ export const getBunny = async (_id) => {
       }
     })
     const bunny = result.map((bunny) => {
-      const { photos } = bunny
+      const { photos, followers } = bunny
+
       const reel = photos?.map((photo) => {
         return urlFor(photo).url()
       })
@@ -124,12 +145,49 @@ export const getBunny = async (_id) => {
         bio: bunny.bio,
         trending: bunny.trending,
         offers: bunny.offers,
+        followers: followers.map((follower) => follower.username),
       }
     })
+
+    const isFollowing = bunny[0].followers.includes(username)
+
+    console.log(`${username} is  ${isFollowing ? 'following' : 'not following'}  ${bunny[0].name}`)
+
     return {
       bunny: bunny[0],
       posts,
+      isFollowing,
     }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getBunnyPosts = async (_id) => {
+  try {
+    const postsData = await client.fetch(
+      `*[_type == "posts" && references("${_id}")]{..., author -> {username, name, avatar}}`,
+    )
+    const posts = postsData.map((post) => {
+      const { image: imageUrl, _id, text, likes, likedby, author } = post
+      const { name: authorName, username: authorUsername, avatar } = author
+
+      const image = urlFor(imageUrl).url()
+      const authorAvatar = urlFor(avatar).url()
+
+      return {
+        image,
+        _id,
+        text,
+        likes,
+        likedby,
+        authorName,
+        authorUsername,
+        authorAvatar,
+      }
+    })
+
+    return posts
   } catch (error) {
     console.log(error)
   }
@@ -359,10 +417,9 @@ export const createEvent = async (username, bunny_id, eventtype) => {
   }
 }
 
-export const getEvents = async (username) => {
+export const getEvents = async (_id) => {
   try {
-    console.log(username)
-    const user = await getUser(username, true)
+    const user = await getUserById(_id, true)
     const { events: data } = user
     if (!data) {
       return []
@@ -373,6 +430,8 @@ export const getEvents = async (username) => {
         eventtype: event.eventtype,
         avatar: urlFor(event.bunny.avatar).url(),
         name: event.bunny.name,
+        username: event.bunny.username,
+        bunny_id: event.bunny._id,
       }
     })
     console.log(events)
@@ -437,10 +496,10 @@ export const getAllPosts = async () => {
   }
 }
 
-export const getPostsFromFollowing = async (username) => {
+export const getPostsFromFollowing = async (_id) => {
   try {
-    const user = await getUser(username)
-    const { _id } = user
+    // const user = await getUser(username)
+    // const { _id } = user
     const query = `*[_type == "bunnies" && references("${_id}")]{..., posts[]->{...,author->{name, avatar, username, _id}, likedby[]->{username}}}`
     const result = await client.fetch(query)
     const postData = result?.map((bunny) => bunny.posts).flat()
@@ -491,5 +550,106 @@ export const LikePost = async (post_id, username) => {
       })
   } catch (error) {
     console.log(error)
+  }
+}
+
+export const init = async (_id) => {
+  try {
+    console.log(_id)
+    const user = await getUserById(_id, true)
+
+    const { events: userEvents, username } = user
+    const bunnyQuery = await client.fetch('*[_type == "bunnies"]{...,followers[] -> {username}}')
+    const postsQuery = await client.fetch(
+      `*[_type == "posts"]{..., author-> {name, avatar, username, _id}, likedby[]->{username}}`,
+    )
+    const postsFromFollowingQuery = await client.fetch(
+      `*[_type == "bunnies" && references("${_id}")]{..., posts[]->{...,author->{name, avatar, username, _id}, likedby[]->{username}}}`,
+    )
+    const postData = postsFromFollowingQuery?.map((bunny) => bunny.posts).flat()
+    const postsFromFollowing = postData?.map((post) => {
+      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
+      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const authorAvatar = urlFor(avatar).url()
+      const likedBy = likedByData?.map((likedBy) => {
+        return likedBy.username
+      })
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        likedBy,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+      }
+    })
+
+    const events = userEvents?.map((event) => {
+      return {
+        date: event.date,
+        eventtype: event.eventtype,
+        avatar: urlFor(event.bunny.avatar).url(),
+        name: event.bunny.name,
+        username: event.bunny.username,
+        bunny_id: event.bunny._id,
+      }
+    })
+    const bunnies = bunnyQuery.map((bunny) => {
+      const { followers: followersData, photos } = bunny
+      const reel = photos?.map((photo) => {
+        return urlFor(photo).url()
+      })
+      const followers = followersData.map((follower) => follower?.username)
+      const isFollowing = followers.includes(username)
+      return {
+        _id: bunny._id,
+        name: bunny.name,
+        username: bunny.username,
+        avatar: urlFor(bunny.avatar).url(),
+        followers: followers.map((follower) => follower?.username),
+        recommended: bunny.recommended,
+        bio: bunny.bio,
+        isFollowing,
+        reel,
+      }
+    })
+    const posts = postsQuery.map((post) => {
+      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
+      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const authorAvatar = urlFor(avatar).url()
+      const likedBy = likedByData?.map((likedBy) => {
+        return likedBy.username
+      })
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        likedBy,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+      }
+    })
+
+    const recommended = bunnies.filter((bunny) => bunny.recommended)
+
+    return {
+      events,
+      bunnies,
+      posts,
+      postsFromFollowing,
+      recommended,
+    }
+  } catch (error) {
+    console.error(error)
   }
 }

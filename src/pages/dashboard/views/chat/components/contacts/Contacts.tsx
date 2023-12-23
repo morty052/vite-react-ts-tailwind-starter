@@ -1,5 +1,5 @@
 import { ChannelList, useChatContext } from 'stream-chat-react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { MessageCircle, Search, Video } from 'lucide-react'
 
@@ -113,10 +113,6 @@ export function Contacts(props: ContactsProps) {
   const { sort, filters, setChannel, channell, username } = props
   const [contacts, setContact] = useState([])
 
-  const [searchParams, setSearchParams] = useSearchParams()
-
-  const bunny_id = searchParams.get('bunny_id')
-
   useEffect(() => {
     if (!username) {
       return
@@ -128,7 +124,6 @@ export function Contacts(props: ContactsProps) {
     <>
       <div className={`col-span-4 xl:col-span-3 ${channell && 'hidden lg:block'}`}>
         <ChannelList
-          customActiveChannel={bunny_id as string}
           EmptyStateIndicator={NoContactScreens}
           List={CustomList}
           Preview={(props) => <Preview bunnies={contacts} setChannel={setChannel} {...props} />}

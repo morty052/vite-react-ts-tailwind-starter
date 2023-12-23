@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link2, MoreVertical, Search } from 'lucide-react'
 import {
   DropdownMenu,
@@ -142,10 +142,7 @@ function SubscriptionStatus() {
   )
 }
 
-export function RecommendationBar() {
-  const [recommended, setRecommended] = useState([])
-  const [bunnies, setBunnies] = useState([])
-
+export function RecommendationBar({ bunnies, recommended }: any) {
   const { username } = useChatContextParams()
 
   const path = useLocation().pathname
@@ -167,22 +164,22 @@ export function RecommendationBar() {
     setBunnies(bunnies.bunnies)
   }
 
-  useEffect(() => {
-    if (!username) {
-      return
-    }
+  // useEffect(() => {
+  //   if (!username) {
+  //     return
+  //   }
 
-    getRecommended()
-    getBunnies()
-  }, [username])
+  //   getRecommended()
+  //   getBunnies()
+  // }, [username])
 
   return (
-    <div className=" hidden  min-h-screen space-y-4  border-l border-white/10  pl-2 lg:block">
-      <div className="  flex flex-col items-center gap-y-2 py-4">
+    <div className=" scrollbar-hidden  hidden h-screen w-full max-w-sm space-y-4  overflow-scroll border-l  border-white/10  px-2 lg:block">
+      <div className="flex  flex-col items-center gap-y-2 py-4">
         {!isProfile && <SearchBar bunnies={bunnies} />}
         {isProfile && <SubscriptionStatus />}
         {isProfile && <EventBooker bunny_id={bunny_id} />}
-        <Reccomendations recommended={recommended} />
+        {<Reccomendations recommended={recommended} />}
       </div>
     </div>
   )

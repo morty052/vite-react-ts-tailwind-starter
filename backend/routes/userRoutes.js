@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   createUser,
+  getUserId,
   likeBunny,
   createEvent,
   getEvents,
@@ -8,6 +9,7 @@ import {
   decUserCredits,
   getOrders,
   getUserBunnies,
+  init,
 } from '../lib/sanityClient.js'
 import { updateAuthUsername } from '../lib/clerk.js'
 
@@ -109,9 +111,9 @@ userRoutes.get('/createevent', async (req, res) => {
 
 userRoutes.get('/events', async (req, res) => {
   const params = req.query
-  const { username } = params
+  const { _id } = params
 
-  const events = await getEvents(username)
+  const events = await getEvents(_id)
 
   res.send({
     message: 'created',
@@ -186,4 +188,16 @@ userRoutes.get('/update-username', async (req, res) => {
   res.send({
     users,
   })
+})
+
+userRoutes.get('/get-userid', async (req, res) => {
+  const { username } = req.query
+  const _id = await getUserId(username)
+  res.send({ _id })
+})
+
+userRoutes.get('/init', async (req, res) => {
+  const { _id } = req.query
+  const data = await init(_id)
+  res.send(data)
 })

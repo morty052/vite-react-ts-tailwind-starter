@@ -1,6 +1,6 @@
 import { ArrowRight, Bookmark, ChevronDown, ChevronUp, CircleDollarSign, Heart, UserPlus } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { createChat } from 'src/hooks/useChatClient'
 import { Button } from '../ui/button'
@@ -40,6 +40,16 @@ function TippingVisuals({ avatar, tip, setTip }: { avatar: string; tip: number; 
   )
 }
 
+const allTips = [50, 100, 500, 1000]
+
+function QuickTipTab({ amount }: { amount: number }) {
+  return (
+    <div className="flex h-10 w-20 items-center justify-center rounded-xl border bg-fuchsia-500 p-1">
+      <p className="text-sm font-semibold">{amount}</p>
+    </div>
+  )
+}
+
 function UserBalance({ tip }) {
   return (
     <div className="flex w-full justify-between self-start">
@@ -75,7 +85,7 @@ function TippingModal({ open, setOpen, eventName, avatar }) {
     setOpen(false)
     toast({
       title: 'Tip Sent ✅',
-      description: 'Tip Sent',
+      description: `Sent  ${tip}`,
     })
   }
   const EventConfirmation = () => {
@@ -83,11 +93,31 @@ function TippingModal({ open, setOpen, eventName, avatar }) {
       <div className="px-2 sm:px-0">
         <div className="flex flex-col items-center space-y-4 rounded-lg  bg-white p-4">
           <div className="w-full space-y-4  ">
-            <UserBalance tip={tip} />
-            <TippingVisuals tip={tip} setTip={setTip} avatar={avatar} />
-            <Button className="mx-auto w-full max-w-md" onClick={confirmTip} size={'lg'}>
-              Confirm
-            </Button>
+            {/* <UserBalance tip={tip} />
+            <TippingVisuals tip={tip} setTip={setTip} avatar={avatar} /> */}
+            <div className="mx-auto w-full max-w-md space-y-4">
+              <div className="">
+                <p className="font-medium">Quick tip:</p>
+                <div className="flex flex-wrap  gap-1">
+                  {allTips.map((tip, index) => (
+                    <QuickTipTab key={index} amount={tip} />
+                  ))}
+                </div>
+              </div>
+              <input
+                placeholder="Enter custom amount"
+                className="w-full rounded border p-2 text-center "
+                type="text"
+                name=""
+                id=""
+              />
+              <div className=" space-y-2">
+                <Button className="w-full max-w-md" onClick={confirmTip} size={'lg'}>
+                  Confirm
+                </Button>
+                <p className="text-center text-xs">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -117,9 +147,14 @@ function TippingModal({ open, setOpen, eventName, avatar }) {
 export function PostCard(props: PostCardProps) {
   const [liked, setLiked] = useState<null | number>(null)
   const [open, setOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+
   const { image, _id, likedBy, authorName, authorAvatar, text, authorUsername, time, likes, author_id } = props ?? {}
 
-  const timestamp = new Date(time).toLocaleString('default', { month: 'short' }) + ' ' + new Date(time).getDay()
+  // !name of id variable changed here
+  const base_id = searchParams.get('_id')
+
+  const baseUrl = `?_id=${base_id}`
 
   const navigation = useNavigate()
   const { username: user } = useChatContextParams()

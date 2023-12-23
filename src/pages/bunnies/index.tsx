@@ -1,10 +1,11 @@
 import { Heart, MessageSquare } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { likeBunny } from './features'
-import { Header, PostCard, PostCardProps } from 'src/components'
+import { PostCard, PostCardProps } from 'src/components'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'src/components/ui/tabs'
+import { Skeleton } from 'src/components/ui/skeleton'
+import { useQuery } from '@tanstack/react-query'
 
 interface BunnyCardProps {
   username: string
@@ -14,27 +15,74 @@ interface BunnyCardProps {
   following: string[]
 }
 
-const BunnyTabs = () => {
-  const [following, setFollowing] = useState([])
-  const [posts, setPosts] = useState([])
-
-  const { username } = useChatContextParams()
-
-  async function getPosts() {
-    const res = await fetch(`http://192.168.100.16:3000/posts?username=${username}`)
-    const data = await res.json()
-    const { posts, postsFromFollowing } = data
-    console.log(postsFromFollowing)
-    setFollowing(postsFromFollowing)
-    setPosts(posts)
+const Feed = ({ items, loading }: any) => {
+  const FeedSkeleton = () => {
+    return (
+      <div className="space-y-6 divide-y">
+        <div className="mx-2 space-y-2 py-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-14 w-14 rounded-full bg-dark" />
+          </div>
+          <Skeleton className="h-48 w-full bg-dark" />
+        </div>
+        <div className="mx-2 space-y-2 py-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-14 w-14 rounded-full bg-dark" />
+          </div>
+          <Skeleton className="h-48 w-full bg-dark" />
+        </div>
+        <div className="mx-2 space-y-2 py-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-14 w-14 rounded-full bg-dark" />
+          </div>
+          <Skeleton className="h-48 w-full bg-dark" />
+        </div>
+      </div>
+    )
   }
 
-  useEffect(() => {
-    if (!username) {
-      return
-    }
-    getPosts()
-  }, [username])
+  if (loading) {
+    return <FeedSkeleton />
+  }
+
+  return (
+    <div className="pb-10">
+      {items?.map((post: PostCardProps, index: number) => {
+        return (
+          <div key={index} className="">
+            <PostCard {...post} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+const BunnyTabs = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  // const [posts, setPosts] = useState([])
+
+  const _id = localStorage.getItem('_id')
+
+  async function getPosts() {
+    const res = await fetch(`http://192.168.100.16:3000/posts?_id=${_id}`)
+    const data = await res.json()
+    const { posts, postsFromFollowing } = data
+    return { posts, postsFromFollowing }
+    // setFollowing(postsFromFollowing)
+    // setPosts(posts)
+  }
+
+  const { isLoading, error, data: postsData } = useQuery({ queryKey: ['posts'], queryFn: getPosts })
+
+  const { posts, postsFromFollowing } = postsData ?? {}
+
+  // useEffect(() => {
+  //   if (!username) {
+  //     return
+  //   }
+  //   getPosts()
+  // }, [username])
 
   return (
     <Tabs defaultValue="foryou" className=" w-full">
@@ -47,27 +95,11 @@ const BunnyTabs = () => {
         </TabsTrigger>
       </TabsList>
       <TabsContent className="" value="foryou">
-        <div className="pb-10">
-          {posts.map((post: PostCardProps, index) => {
-            return (
-              <div key={index} className="">
-                <PostCard {...post} />
-              </div>
-            )
-          })}
-        </div>
+        <Feed loading={isLoading} items={posts} />
       </TabsContent>
       <TabsContent value="following">
-        {following.length > 0 ? (
-          <div className="pb-10">
-            {following.map((post: PostCardProps, index: number) => {
-              return (
-                <div key={index} className="">
-                  <PostCard {...post} />
-                </div>
-              )
-            })}
-          </div>
+        {postsFromFollowing?.length > 0 ? (
+          <Feed loading={isLoading} items={postsFromFollowing} />
         ) : (
           <p className="primary-text">Not following yet</p>
         )}
@@ -134,33 +166,7 @@ function BunnySorter(params: type) {
   )
 }
 
-export function Bunnies() {
-  const [bunnies, setBunnies] = useState([])
-
-  const { username } = useChatContextParams()
-
-  async function getBunnies() {
-    const res = await fetch(`http://192.168.100.16:3000/bunny/allbunnies?username=${username}`)
-    const bunnies = await res.json()
-    setBunnies(bunnies.bunnies)
-    setFollowing(bunnies.following)
-  }
-  async function getPosts() {
-    const res = await fetch(`http://192.168.100.16:3000/posts?username=${username}`)
-    const data = await res.json()
-    const { posts, postsFromFollowing } = data
-    console.log(postsFromFollowing)
-    setFollowing(postsFromFollowing)
-    setPosts(posts)
-  }
-
-  useEffect(() => {
-    if (!username) {
-      return
-    }
-    getBunnies()
-  }, [username])
-
+export function Bunnies({ bunnies, posts, following }: any) {
   if (!bunnies) {
     return null
   }
@@ -168,8 +174,7 @@ export function Bunnies() {
   return (
     <>
       <div className="pb-14 ">
-        <Header bunnies={bunnies} base />
-        <BunnyTabs />
+        <BunnyTabs posts={posts} following={following} />
       </div>
     </>
   )

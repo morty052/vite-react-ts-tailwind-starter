@@ -6,7 +6,7 @@ import { Avatar, Channel, Chat, MessageInput, MessageList, Thread, Window, useCh
 import 'stream-chat-react/dist/css/v2/index.css'
 import { ChatContextWindow, Contacts } from './components'
 
-export function DirectMessages() {
+export function ChatPage() {
   const [channel, setchannel] = useState<DefaultGenerics | undefined>(undefined)
 
   const { username, loading } = useChatContextParams()

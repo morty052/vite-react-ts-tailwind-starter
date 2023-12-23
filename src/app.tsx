@@ -6,6 +6,7 @@ import { Toaster } from './components/ui/toaster'
 import './styles/app.css'
 import { ChatContextProvider } from './contexts/ChatContext'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export default function App() {
   const queryClient = useMemo(() => new QueryClient({}), [])
@@ -20,7 +21,7 @@ export default function App() {
         </ChatContextProvider>
         <Toaster />
       </ClerkProvider>
-      {/* <ReactQueryDevtools /> */}
+      <ReactQueryDevtools />
     </QueryClientProvider>
   )
 }

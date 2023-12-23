@@ -4,9 +4,9 @@ import { LikePost, getAllPosts, getPostsFromFollowing } from '../lib/sanityClien
 export const postRoutes = express.Router()
 
 postRoutes.get('/', async (req, res) => {
-  const { username } = req.query
+  const { _id } = req.query
   const posts = await getAllPosts()
-  const postsFromFollowing = await getPostsFromFollowing(username)
+  const postsFromFollowing = await getPostsFromFollowing(_id)
   res.send({
     posts,
     postsFromFollowing,

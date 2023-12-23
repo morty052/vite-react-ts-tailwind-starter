@@ -67,7 +67,7 @@ const SidebarLink = ({ name, path, icon }: { name: string; path: string; icon: R
   return (
     <Link to={path} className=" items-center gap-x-4 xl:flex">
       <div className="grid h-12 w-12 place-content-center rounded-full ">{icon}</div>
-      <span className="hidden flex-1 text-xl font-semibold xl:block">{name}</span>
+      <span className="hidden flex-1 text-xl font-semibold first-letter:uppercase xl:block">{name}</span>
     </Link>
   )
 }
@@ -84,7 +84,7 @@ const SidebarLinksContainer = () => {
   return (
     <div className="flex flex-col gap-y-10  px-2  pt-4 xl:items-start">
       {sidebarLinks.map((link) => (
-        <SidebarLink key={link.name} name={link.name} path={link.path} icon={link.icon} />
+        <SidebarLink key={link.name} name={link.name} path={`${link.path}`} icon={link.icon} />
       ))}
     </div>
   )

@@ -2,7 +2,6 @@ import { ChevronDown, ChevronUp, CreditCard, PlusCircle, RabbitIcon } from 'luci
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { useState, useEffect } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
-import { Header } from 'src/components'
 import { Button } from 'src/components/ui/button'
 
 type order = {
@@ -39,7 +38,7 @@ const Order = ({ order }: { order: order }) => {
 
 const WalletActionsButton = ({ credits }: { credits: number }) => {
   return (
-    <div className="flex items-center justify-between border p-2">
+    <div className="flex items-center justify-between  p-2">
       <div className="flex items-center gap-x-2">
         <p className="text-2xl font-semibold text-light">{credits ? credits : 0}</p>
         <RabbitIcon color="pink" />
@@ -74,7 +73,7 @@ const OrdersHeader = ({
   transactionsExpanded: boolean
 }) => {
   return (
-    <div className="flex items-center justify-between border-b p-2">
+    <div className="mt-2 flex items-center justify-between rounded-md border p-2">
       <p className="text-sm text-light">Wallet Activity</p>
       <div className="flex gap-x-2">
         {transactionsExpanded ? (
@@ -180,7 +179,6 @@ export const Packages = () => {
 
   return (
     <>
-      <Header base />
       <section className="">
         <div className="mx-auto max-w-screen-xs space-y-4 px-4   lg:px-6">
           <div className="py-4">
@@ -360,10 +358,9 @@ const CardForm = () => {
 const WalletView = ({ credits, orders }: { credits: number; orders: order[] }) => {
   const [transactionsExpanded, setTransactionsExpanded] = useState(true)
   return (
-    <div className="h-screen">
-      <Header base />
+    <div className="mx-auto h-screen max-w-xl">
       <WalletActionsButton credits={credits as number} />
-      <CardForm />
+      {/* <CardForm /> */}
       <OrdersHeader setTransactionsExpanded={setTransactionsExpanded} transactionsExpanded={transactionsExpanded} />
       <UserOrders transactionsExpanded={transactionsExpanded} orders={orders} />
     </div>
