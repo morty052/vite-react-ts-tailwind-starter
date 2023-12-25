@@ -296,20 +296,20 @@ export const bookmarkPost = async (_id, post_id) => {
     _type: 'bookmarks',
     _ref: post_id,
   }
-  const result = await client.fetch(`*[_type == "posts" && _id == "${post_id}"]{..., bookmarkers[] -> {_id}}`)
-  const bookMarks = result
-    .map((post) => {
-      return post.bookmarkers
-    })
-    .flat()
-    .map((post) => post._id)
+  // const result = await client.fetch(`*[_type == "posts" && _id == "${post_id}"]{..., bookmarkers[] -> {_id}}`)
+  // const bookMarks = result
+  //   .map((post) => {
+  //     return post.bookmarkers
+  //   })
+  //   .flat()
+  //   .map((post) => post._id)
 
-  const isBookmarked = bookMarks.includes(_id)
+  // const isBookmarked = bookMarks.includes(_id)
 
-  if (isBookmarked) {
-    console.info('Already bookmarked')
-    return
-  }
+  // if (isBookmarked) {
+  //   console.info('Already bookmarked')
+  //   return
+  // }
 
   try {
     console.log(post_id)
@@ -319,7 +319,6 @@ export const bookmarkPost = async (_id, post_id) => {
       .insert('after', 'bookmarked[-1]', [newPost])
       .commit({ autoGenerateArrayKeys: true })
 
-    // TODO: iMPLEMENT ADDING BOOKMARKS TO POSTS DATABASE
     await client
       .patch(post_id)
       .setIfMissing({ bookmarkers: [] })
@@ -429,7 +428,7 @@ export const getOrders = async (username) => {
   }
 }
 
-export const createEvent = async (username, bunny_id, eventtype) => {
+export const createEvent = async (_id, bunny_id, eventtype) => {
   const newEvent = {
     _type: 'event',
     date: new Date().toISOString(),
@@ -441,8 +440,6 @@ export const createEvent = async (username, bunny_id, eventtype) => {
   }
 
   try {
-    const user = await getUser(username)
-    const { _id } = user
     await client
       .patch(_id)
       .setIfMissing({ events: [] })
@@ -496,9 +493,9 @@ export const getUserCredits = async (_id) => {
  * @param {number} amount - The amount by which to decrease the credits.
  * @return {Promise} The new value of the user's credits after the decrease.
  */
-export const decUserCredits = async (username, amount) => {
-  const user = await getUser(username)
-  const { credits, _id } = user
+export const decUserCredits = async (_id, amount) => {
+  const user = await getUserById(_id)
+  const { credits } = user
 
   const newCredits = credits - amount
 
@@ -659,7 +656,8 @@ export const init = async (_id) => {
       }
     })
     const bunnies = bunnyQuery.map((bunny) => {
-      const { followers: followersData, photos } = bunny
+      const { followers: followersData, photos, pricing } = bunny
+
       const reel = photos?.map((photo) => {
         return urlFor(photo).url()
       })
@@ -675,6 +673,7 @@ export const init = async (_id) => {
         bio: bunny.bio,
         isFollowing,
         reel,
+        pricing,
       }
     })
     const posts = postsQuery.map((post) => {
@@ -699,7 +698,12 @@ export const init = async (_id) => {
       }
     })
 
-    const recommended = bunnies.filter((bunny) => bunny.recommended)
+    const recommended = bunnies
+      .filter((bunny) => bunny.recommended)
+      .map((bunny) => ({
+        ...bunny,
+        cover: bunny.reel[0],
+      }))
 
     return {
       events,

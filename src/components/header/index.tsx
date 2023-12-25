@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link2, MoreVertical, Search, X } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -140,7 +140,19 @@ export function Header({ bunnies }) {
   // const { isProfile, bunnyName, base, bunnies } = props ?? {}
   const path = useLocation().pathname
   const isProfile = path.includes('bunny')
-  const isWallet = path.includes('packages')
+
+  const isSecondaryHeader = useMemo(() => {
+    if (isProfile) {
+      return true
+    }
+    if (path.includes('wallet')) {
+      return true
+    }
+    if (path.includes('packages')) {
+      return true
+    }
+    return false
+  }, [path])
 
   const bunny_id = isProfile ? path.replace('/dashboard/bunny/', '') : ''
   const bunny = bunnies?.find((b) => b._id === bunny_id)
@@ -150,13 +162,13 @@ export function Header({ bunnies }) {
   const Backbutton = () => {
     return (
       <>
-        {isProfile ||
+        {/* {isProfile ||
           (isWallet && (
-            <a onClick={() => navigate(-1)} className="flex items-center gap-x-2">
-              <span className="text-light">&#8592;</span>
-              <p className="text-light first-letter:uppercase">{isProfile ? bunnyName : 'Back'}</p>
-            </a>
-          ))}
+          ))} */}
+        <a onClick={() => navigate(-1)} className="flex items-center gap-x-2">
+          <span className="text-light">&#8592;</span>
+          <p className="text-light first-letter:uppercase">{isProfile ? bunnyName : 'Back'}</p>
+        </a>
       </>
     )
   }
@@ -164,7 +176,7 @@ export function Header({ bunnies }) {
     <>
       <div className="sticky inset-x-0 top-0 z-10 border-b border-white/20 bg-black  ">
         <div className="flex items-center justify-between px-2 py-4">
-          {!isProfile && !isWallet ? <p className="primary-text">Bunnies</p> : <Backbutton />}
+          {!isSecondaryHeader ? <p className="primary-text">Bunnies</p> : <Backbutton />}
           <SearchInput searching={searching} bunnies={bunnies} setSearching={setSearching} />
           <DefaultHeaderButtons searching={searching} setSearching={setSearching} />
         </div>

@@ -65,6 +65,7 @@ function DashBoardLayout({ bunnies, recommended }) {
 //   return { bunny, posts, isFollowing }
 // }
 
+// TODO: REDUCE DATA FETCHED FROM SERVER
 export function DashBoard() {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState({

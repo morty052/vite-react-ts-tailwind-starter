@@ -17,6 +17,8 @@ type ReccomendationCardProps = {
   name: string
   avatar: string
   username: string
+  _id: string
+  cover: string
 }
 
 const SearchResult = ({ avatar, name, username, _id }) => {
@@ -67,7 +69,7 @@ const SearchBar = ({ bunnies }) => {
   )
 }
 
-const ReccomendationCard = ({ name, avatar, username, _id }: ReccomendationCardProps) => {
+const ReccomendationCard = ({ name, avatar, username, _id, cover }: ReccomendationCardProps) => {
   const navigate = useNavigate()
   const MenuButton = () => {
     return (
@@ -95,14 +97,10 @@ const ReccomendationCard = ({ name, avatar, username, _id }: ReccomendationCardP
       <img
         onClick={() => navigate(`/dashboard/bunny/${_id}`)}
         className="absolute bottom-2 left-2 z-10 h-24 w-24 rounded-full border-2 object-cover"
-        src="https://cdn.sanity.io/images/i7m1o5ma/production/106cbd4ddf628480eb902a8f2473f032f162aa6c-1038x1280.jpg"
+        src={avatar}
         alt=""
       />
-      <img
-        className=" h-[132px] w-[384px]  rounded-md object-cover"
-        src="https://cdn.sanity.io/images/i7m1o5ma/production/a3506418e9de9bce024f9fcc9828d5fa96c381d9-1032x1280.jpg"
-        alt=""
-      />
+      <img className=" h-[132px] w-[384px]  rounded-md object-cover" src={cover} alt="" />
       <div
         onClick={() => navigate(`/dashboard/bunny/${_id}`)}
         className="absolute inset-x-0 bottom-0 top-[60%] flex justify-end bg-black/50 px-2 "
@@ -151,6 +149,14 @@ export function RecommendationBar({ bunnies, recommended }: any) {
 
   const bunny_id = useLocation().pathname.replace('/dashboard/bunny/', '')
 
+  const bunny = useMemo(() => {
+    if (isProfile) {
+      return bunnies?.find((b) => b._id === bunny_id)
+    }
+  }, [isProfile, bunny_id, bunnies])
+  const { avatar, name, _id, bio, username: bunny_username, pricing } = bunny ?? {}
+  console.log(bunny)
+
   async function getRecommended() {
     const res = await fetch('http://192.168.100.16:3000/bunny/recommended')
     const data = await res.json()
@@ -177,8 +183,16 @@ export function RecommendationBar({ bunnies, recommended }: any) {
     <div className=" scrollbar-hidden  hidden h-screen w-full max-w-sm space-y-4  overflow-scroll border-l  border-white/10  px-2 lg:block">
       <div className="flex  flex-col items-center gap-y-2 py-4">
         {!isProfile && <SearchBar bunnies={bunnies} />}
-        {isProfile && <SubscriptionStatus />}
-        {isProfile && <EventBooker bunny_id={bunny_id} />}
+        {/* {isProfile && <SubscriptionStatus />} */}
+        {isProfile && (
+          <EventBooker
+            bunny_username={bunny_username}
+            bunny_name={name}
+            avatar={avatar}
+            pricing={pricing}
+            bunny_id={_id as string}
+          />
+        )}
         {<Reccomendations recommended={recommended} />}
       </div>
     </div>

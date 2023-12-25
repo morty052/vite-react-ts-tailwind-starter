@@ -25,6 +25,9 @@ function CheckBoxField({ checked, setChecked, title, description }: any) {
   )
 }
 
+// TODO : ADD SETTINGS LOGIC
+
+// TODO: ADD MORE SETTINGS
 export function UserProfile() {
   const [marketingEmails, setmarketingEmails] = useState(true)
   const [eventEmails, seteventEmails] = useState(true)

@@ -14,4 +14,9 @@ export type bunny = {
   verified: boolean
   reel: string[]
   recommended: boolean
+  pricing: {
+    photo_price: number
+    video_price: number
+    date_price: number
+  }
 }

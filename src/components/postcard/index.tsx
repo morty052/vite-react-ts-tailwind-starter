@@ -156,7 +156,7 @@ const TipConfirmation = (props: any) => {
   return (
     <div className="px-2 sm:px-0">
       <div className="flex flex-col items-center space-y-4 rounded-lg  bg-white p-4">
-        <div className="w-full max-w-md  space-y-6 ">
+        <div className="w-full max-w-sm  space-y-6 ">
           {/* <UserBalance tip={tip} /> */}
           <TippingVisuals
             insufficientBalance={insufficientBalance}

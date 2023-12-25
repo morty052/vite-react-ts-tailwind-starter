@@ -113,9 +113,9 @@ userRoutes.get('/get-user-bunnies', async (req, res) => {
 
 userRoutes.get('/createevent', async (req, res) => {
   const params = req.query
-  const { username, bunny_id, eventtype } = params
+  const { _id, bunny_id, eventtype } = params
 
-  await createEvent(username, bunny_id, eventtype)
+  await createEvent(_id, bunny_id, eventtype)
 
   res.send({
     message: 'created',
@@ -154,9 +154,9 @@ userRoutes.get('/credits', async (req, res) => {
 
 userRoutes.get('/spend', async (req, res) => {
   const params = req.query
-  const { username, amount } = params
+  const { _id, amount } = params
 
-  const balance = await decUserCredits(username, amount)
+  const balance = await decUserCredits(_id, amount)
 
   res.send({
     message: 'created',

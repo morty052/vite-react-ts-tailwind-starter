@@ -124,7 +124,7 @@ function SearchBarColumn() {
 }
 
 function MainProfile({ bunny, posts, following }: { bunny: bunny; posts: Post[]; following: boolean }) {
-  const { avatar, name, _id, bio, username } = bunny
+  const { avatar, name, _id, bio, username, pricing } = bunny
   return (
     <>
       <div className="col-span-4 w-full">
@@ -137,7 +137,13 @@ function MainProfile({ bunny, posts, following }: { bunny: bunny; posts: Post[];
         />
         <Bio username={username} bio={bio} name={name} />
         <div className="md:hidden">
-          <EventBooker bunny_id={_id as string} />
+          <EventBooker
+            bunny_username={username}
+            bunny_name={name}
+            avatar={avatar}
+            pricing={pricing}
+            bunny_id={_id as string}
+          />
         </div>
         <ProfileTabs posts={posts} bunny={bunny} />
       </div>
@@ -145,6 +151,7 @@ function MainProfile({ bunny, posts, following }: { bunny: bunny; posts: Post[];
   )
 }
 
+// TODO: ADD PRICING DATA FOR BUNNIES
 export function Profile({ username, bunnies }) {
   // const [bunny, setBunny] = useState<bunny | null>(null)
   const [posts, setPosts] = useState([])

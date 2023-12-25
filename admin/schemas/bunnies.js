@@ -94,5 +94,27 @@ export default {
         },
       ],
     },
+    {
+      name: 'pricing',
+      title: 'Pricing',
+      type: 'object',
+      fields: [
+        {
+          name: 'photo_price',
+          type: 'number',
+          title: 'Photo-price',
+        },
+        {
+          name: 'video_price',
+          type: 'number',
+          title: 'Video-price',
+        },
+        {
+          name: 'date_price',
+          type: 'number',
+          title: 'Date-price',
+        },
+      ],
+    },
   ],
 }
