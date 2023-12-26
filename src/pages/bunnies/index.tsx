@@ -1,5 +1,5 @@
 import { Heart, MessageSquare } from 'lucide-react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { likeBunny } from './features'
 import { PostCard, PostCardProps } from 'src/components'
@@ -15,7 +15,7 @@ interface BunnyCardProps {
   following: string[]
 }
 
-const Feed = ({ items, loading }: any) => {
+const Feed = ({ items, loading, postIsFromFollowing }: any) => {
   const FeedSkeleton = () => {
     return (
       <div className="space-y-6 divide-y">
@@ -59,11 +59,11 @@ const Feed = ({ items, loading }: any) => {
 }
 
 const BunnyTabs = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
   // const [posts, setPosts] = useState([])
 
   const _id = localStorage.getItem('_id')
 
+  // TODO: CHANGE SERVER URL
   async function getPosts() {
     const res = await fetch(`http://192.168.100.16:3000/posts?_id=${_id}`)
     const data = await res.json()
@@ -99,7 +99,7 @@ const BunnyTabs = () => {
       </TabsContent>
       <TabsContent value="following">
         {postsFromFollowing?.length > 0 ? (
-          <Feed loading={isLoading} items={postsFromFollowing} />
+          <Feed postIsFromFollowing loading={isLoading} items={postsFromFollowing} />
         ) : (
           <p className="primary-text">Not following yet</p>
         )}
@@ -156,7 +156,7 @@ function BunnyCard({ username, avatar, _id, following }: BunnyCardProps) {
   )
 }
 
-function BunnySorter(params: type) {
+function BunnySorter() {
   return (
     <div className="px-2">
       <div className="border ">
@@ -174,7 +174,7 @@ export function Bunnies({ bunnies, posts, following }: any) {
   return (
     <>
       <div className="pb-14 ">
-        <BunnyTabs posts={posts} following={following} />
+        <BunnyTabs />
       </div>
     </>
   )

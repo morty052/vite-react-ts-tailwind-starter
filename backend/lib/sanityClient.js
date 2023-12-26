@@ -146,6 +146,8 @@ export const getBunny = async (_id, username) => {
         trending: bunny.trending,
         offers: bunny.offers,
         followers: followers.map((follower) => follower.username),
+        online: bunny.online,
+        last_seen: bunny.last_seen,
       }
     })
 
@@ -209,6 +211,8 @@ export const getBunnyContext = async (name) => {
         bio: bunny.bio,
         trending: bunny.trending,
         offers: bunny.offers,
+        online: bunny.online,
+        last_seen: bunny.last_seen,
       }
     })
     return {
@@ -234,6 +238,8 @@ export const getUserBunnies = async (username) => {
       return {
         name,
         avatar,
+        online: bunny.online,
+        last_seen: bunny.last_seen,
       }
     })
     return bunnies
@@ -296,20 +302,6 @@ export const bookmarkPost = async (_id, post_id) => {
     _type: 'bookmarks',
     _ref: post_id,
   }
-  // const result = await client.fetch(`*[_type == "posts" && _id == "${post_id}"]{..., bookmarkers[] -> {_id}}`)
-  // const bookMarks = result
-  //   .map((post) => {
-  //     return post.bookmarkers
-  //   })
-  //   .flat()
-  //   .map((post) => post._id)
-
-  // const isBookmarked = bookMarks.includes(_id)
-
-  // if (isBookmarked) {
-  //   console.info('Already bookmarked')
-  //   return
-  // }
 
   try {
     console.log(post_id)
@@ -329,6 +321,22 @@ export const bookmarkPost = async (_id, post_id) => {
         },
       ])
       .commit({ autoGenerateArrayKeys: true })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const removePostBookmark = async (_id, post_id) => {
+  try {
+    const bookmarks = await client.fetch(`*[_type == "posts" && _id == "${post_id}"].bookmarkers[] -> {_id}`)
+    const bookMarkersArray = Array.from(bookmarks, (b) => b._id)
+    const bookmarkToRemove = bookMarkersArray.indexOf(_id)
+    console.log(bookmarkToRemove)
+
+    await client
+      .patch(post_id)
+      .unset([`bookmarkers[${bookmarkToRemove}]`])
+      .commit()
   } catch (error) {
     console.error(error)
   }
@@ -506,7 +514,7 @@ export const decUserCredits = async (_id, amount) => {
 
 export const getAllPosts = async (user_id) => {
   try {
-    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{username}, bookmarkers[] -> {_id}}`
+    const query = `*[_type == "posts"]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{_id}, bookmarkers[] -> {_id}}`
     const result = await client.fetch(query)
 
     const posts = result.map((post) => {
@@ -514,7 +522,7 @@ export const getAllPosts = async (user_id) => {
       const { name, avatar, username: authorUsername, _id: author_id, followers: authorFollowers } = author
       const authorAvatar = urlFor(avatar).url()
       const likedBy = likedByData?.map((likedBy) => {
-        return likedBy.username
+        return likedBy._id
       })
 
       const bookMarks = bookmarkers?.map((post) => {
@@ -529,6 +537,8 @@ export const getAllPosts = async (user_id) => {
 
       const isBookmarked = bookMarks?.includes(user_id)
 
+      const liked = likedBy?.includes(user_id)
+
       return {
         _id,
         text,
@@ -542,10 +552,9 @@ export const getAllPosts = async (user_id) => {
         time: _createdAt,
         isBookmarked: isBookmarked || false,
         isFollowing: isFollowing || false,
+        liked,
       }
     })
-
-    console.log(posts)
 
     return posts
   } catch (error) {
@@ -579,6 +588,7 @@ export const getPostsFromFollowing = async (_id) => {
         authorUsername,
         author_id,
         time: _createdAt,
+        postIsFromFollowing: true,
       }
     })
     return posts
@@ -587,10 +597,8 @@ export const getPostsFromFollowing = async (_id) => {
   }
 }
 
-export const LikePost = async (post_id, username) => {
+export const LikePost = async (post_id, _id) => {
   try {
-    const user = await getUser(username)
-    const { _id } = user
     const newLike = {
       _type: 'reference',
       _ref: _id,
@@ -610,6 +618,68 @@ export const LikePost = async (post_id, username) => {
   }
 }
 
+export const unLikePost = async (post_id, _id) => {
+  try {
+    const likers = await client.fetch(`*[_type == "posts" && _id == "${post_id}"].likedby[] -> {_id}`)
+    const postLikersArray = Array.from(likers, (b) => b._id)
+    const likeToRemove = postLikersArray.indexOf(_id)
+    console.log(likeToRemove, 'heehe')
+    await client
+      .patch(post_id)
+      .setIfMissing({ likes: 0 })
+      .dec({ likes: 1 })
+      .unset([`likedby[${likeToRemove}]`])
+      .commit()
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export const GetBookmarks = async (user_id) => {
+  const query = `*[_type == "posts" && references("${user_id}")]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{username}, bookmarkers[] -> {_id}}`
+  try {
+    const result = await client.fetch(query)
+    const posts = result?.map((post) => {
+      const { author, likes, text, _createdAt, _id, likedby: likedByData, bookmarkers } = post ?? {}
+      const { name, avatar, username: authorUsername, _id: author_id, followers: authorFollowers } = author ?? {}
+      const authorAvatar = urlFor(avatar).url()
+      const likedBy = likedByData?.map((likedBy) => {
+        return likedBy.username
+      })
+
+      const bookMarks = bookmarkers?.map((post) => {
+        return post._id
+      })
+
+      const followers = authorFollowers?.map((follower) => {
+        return follower._id
+      })
+
+      const isFollowing = followers?.includes(user_id)
+
+      const isBookmarked = bookMarks?.includes(user_id)
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        likedBy,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+        isBookmarked: isBookmarked || false,
+        isFollowing: isFollowing || false,
+      }
+    })
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export const init = async (_id) => {
   try {
     const user = await getUserById(_id, true)
@@ -617,7 +687,7 @@ export const init = async (_id) => {
     const { events: userEvents, username } = user
     const bunnyQuery = await client.fetch('*[_type == "bunnies"]{...,followers[] -> {username}}')
     const postsQuery = await client.fetch(
-      `*[_type == "posts"]{..., author-> {name, avatar, username, _id}, likedby[]->{username}}`,
+      `*[_type == "posts"]{..., author-> {name, avatar, username, _id}, likedby[]->{_id}}`,
     )
     const postsFromFollowingQuery = await client.fetch(
       `*[_type == "bunnies" && references("${_id}")]{..., posts[]->{...,author->{name, avatar, username, _id}, likedby[]->{username}}}`,
@@ -661,31 +731,34 @@ export const init = async (_id) => {
       const reel = photos?.map((photo) => {
         return urlFor(photo).url()
       })
-      const followers = followersData.map((follower) => follower?.username)
-      const isFollowing = followers.includes(username)
+      const followers = followersData?.map((follower) => follower?.username)
+      const isFollowing = followers?.includes(username)
       return {
         _id: bunny._id,
         name: bunny.name,
         username: bunny.username,
         avatar: urlFor(bunny.avatar).url(),
-        followers: followers.map((follower) => follower?.username),
+        followers: followers?.map((follower) => follower?.username),
         recommended: bunny.recommended,
         bio: bunny.bio,
         isFollowing,
         reel,
         pricing,
+        online: bunny.online,
+        last_seen: bunny.last_seen,
       }
     })
     const posts = postsQuery.map((post) => {
-      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
+      const { author, likes, text, _createdAt, _id: post_id, likedby: likedByData } = post
       const { name, avatar, username: authorUsername, _id: author_id } = author
       const authorAvatar = urlFor(avatar).url()
       const likedBy = likedByData?.map((likedBy) => {
-        return likedBy.username
+        return likedBy._id
       })
+      const liked = likedBy.includes(_id)
 
       return {
-        _id,
+        _id: post_id,
         text,
         image: urlFor(post.image).url(),
         likes,
@@ -695,6 +768,7 @@ export const init = async (_id) => {
         authorUsername,
         author_id,
         time: _createdAt,
+        liked,
       }
     })
 

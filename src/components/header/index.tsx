@@ -9,6 +9,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
+import { Button } from '../ui/button'
+import { Dialog, DialogContent } from '../ui/dialog'
+import toast from 'react-hot-toast'
 
 interface IheaderProps {
   isProfile?: boolean
@@ -17,7 +20,78 @@ interface IheaderProps {
   bunnies: any
 }
 
+function CustomizationTextArea({ message, setMessage }: any) {
+  return (
+    <div className="w-full max-w-md space-y-2 rounded-lg border bg-white p-2">
+      <textarea
+        placeholder="how can we help."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        rows={5}
+        className="text_area relative w-full rounded-md bg-transparent   px-2 text-dark  focus:outline-none"
+      ></textarea>
+    </div>
+  )
+}
+
+function ContactUsModal(props: any) {
+  const { open, setOpen, handleSendMessage } = props
+
+  const [loading, setLoading] = useState(false)
+  const [messages, setMessages] = useState('')
+
+  function handleConfirmation() {
+    setMessages('')
+    handleSendMessage(messages)
+  }
+  function handleClose() {
+    setMessages('')
+    setOpen(false)
+    // handleCreateEvent({ CustomRequest, selectedTags, eventName })
+  }
+
+  function ConfirMationButton() {
+    return (
+      <div className=" space-y-2">
+        {/* <p className="text-center text-light ">Spend {photo_price} to order a custom photo </p> */}
+        <Button className="w-full max-w-md bg-fuchsia-500" onClick={() => handleConfirmation()} size={'lg'}>
+          {loading ? 'Confirming...' : 'Confirm'}
+        </Button>
+        <p className="text-center text-xs">Please check your email for your ticket after enquiry.</p>
+      </div>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
+        <div className="relative mt-4 px-2 text-light">
+          <div className="  flex rounded-lg bg-dark px-2 py-6">
+            <div className="mx-auto w-full max-w-md  space-y-6 ">
+              <div className="">
+                <p className="font-medium">Contact us</p>
+                <p className="text-sm">Leave us a message</p>
+              </div>
+              <CustomizationTextArea messages={messages} setMessage={setMessages} />
+              <ConfirMationButton />
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 const MenuDropDown = ({ name }) => {
+  const [open, setOpen] = useState(false)
+  function handleSendMessage(message: string) {
+    if (!message) {
+      setOpen(false)
+      return
+    }
+    toast("We'll get back to you shortly")
+    setOpen(false)
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -25,12 +99,21 @@ const MenuDropDown = ({ name }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>{name}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem> Settings </DropdownMenuItem>
-        <DropdownMenuItem>Notifications</DropdownMenuItem>
-        <DropdownMenuItem>Contact us</DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-blue-700" />
+        <Link className="cursor-pointer" to={'bookmarks'}>
+          <DropdownMenuItem>Bookmarks</DropdownMenuItem>
+        </Link>
+        <Link className="cursor-pointer" to={'notifications'}>
+          <DropdownMenuItem>Notifications</DropdownMenuItem>
+        </Link>
+        <DropdownMenuItem onClick={() => setOpen(true)}>Contact us</DropdownMenuItem>
         {/* <DropdownMenuItem>Subscription</DropdownMenuItem> */}
       </DropdownMenuContent>
+      <ContactUsModal
+        handleSendMessage={(message: string) => handleSendMessage(message)}
+        open={open}
+        setOpen={setOpen}
+      />
     </DropdownMenu>
   )
 }
@@ -140,6 +223,8 @@ export function Header({ bunnies }) {
   // const { isProfile, bunnyName, base, bunnies } = props ?? {}
   const path = useLocation().pathname
   const isProfile = path.includes('bunny')
+  const isBookmarks = path.includes('bookmarks')
+  const isNotifications = path.includes('notifications')
 
   const isSecondaryHeader = useMemo(() => {
     if (isProfile) {
@@ -149,6 +234,12 @@ export function Header({ bunnies }) {
       return true
     }
     if (path.includes('packages')) {
+      return true
+    }
+    if (path.includes('bookmarks')) {
+      return true
+    }
+    if (path.includes('notifications')) {
       return true
     }
     return false
@@ -167,7 +258,11 @@ export function Header({ bunnies }) {
           ))} */}
         <a onClick={() => navigate(-1)} className="flex items-center gap-x-2">
           <span className="text-light">&#8592;</span>
-          <p className="text-light first-letter:uppercase">{isProfile ? bunnyName : 'Back'}</p>
+          {!isBookmarks && !isNotifications && (
+            <p className="text-light first-letter:uppercase">{isProfile ? bunnyName : 'Back'}</p>
+          )}
+          {isBookmarks && <p className="text-light first-letter:uppercase">{'Bookmarks'}</p>}
+          {isNotifications && <p className="text-light first-letter:uppercase">{'Notifications'}</p>}
         </a>
       </>
     )

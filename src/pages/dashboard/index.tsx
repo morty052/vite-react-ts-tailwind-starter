@@ -2,7 +2,7 @@ import { Outlet, Route, Routes } from 'react-router-dom'
 import { BottomNav, Header, RecommendationBar, Sidebar } from 'src/components'
 import { Bunnies } from '../bunnies'
 import { Profile } from '../profile'
-import { EventsPage, NotificationsPage, UserProfile, DirectMessages, Wallet, ChatPage } from './views'
+import { EventsPage, NotificationsPage, UserProfile, DirectMessages, Wallet, ChatPage, Bookmarks } from './views'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useChatContextParams } from 'src/contexts/ChatContext'
@@ -79,6 +79,8 @@ export function DashBoard() {
   const _id = localStorage.getItem('_id')
 
   const { username } = useChatContextParams()
+
+  // TODO: CHANGE SERVER URL
   async function Init() {
     try {
       const res = await fetch(`http://192.168.100.16:3000/users/init?_id=${_id}`)
@@ -113,6 +115,7 @@ export function DashBoard() {
         <Route path="/bunny/:id" element={<Profile bunnies={bunnies} username={username} />} />
         <Route path="/calendar" element={<EventsPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/bookmarks" element={<Bookmarks />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/wallet/*" element={<Wallet />} />
       </Route>

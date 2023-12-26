@@ -1,4 +1,4 @@
-import { Bookmark, CheckCircleIcon, CircleDollarSign, Heart, UserPlus } from 'lucide-react'
+import { CheckCircleIcon, CircleDollarSign, UserPlus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
@@ -7,8 +7,7 @@ import { Button } from '../ui/button'
 import { Dialog, DialogContent } from '../ui/dialog'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '../ui/skeleton'
-import toast from 'react-hot-toast'
-import { ChatButton } from '../interactionbuttons'
+import { BookmarkButton, ChatButton, LikeButton } from '../interactionbuttons'
 
 export type PostCardProps = {
   image: string
@@ -23,6 +22,8 @@ export type PostCardProps = {
   author_id: string
   isBookmarked: boolean
   isFollowing: boolean
+  postIsFromFollowing: boolean
+  liked: boolean
 }
 
 const getUserCredits = async () => {
@@ -262,7 +263,6 @@ function TippingModal({ open, setOpen, eventName, avatar }: any) {
 }
 
 export function PostCard(props: PostCardProps) {
-  const [liked, setLiked] = useState<null | number>(null)
   const [newBookMark, setNewBookMark] = useState(false)
   const [open, setOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -280,6 +280,8 @@ export function PostCard(props: PostCardProps) {
     author_id,
     isBookmarked,
     isFollowing,
+    liked,
+    postIsFromFollowing,
   } = props ?? {}
 
   // !name of id variable changed here
@@ -290,26 +292,8 @@ export function PostCard(props: PostCardProps) {
   const navigation = useNavigate()
   const { username: user } = useChatContextParams()
 
-  const isLiked = likedBy?.includes(user)
-
   function handleViewProfile() {
     navigation(`/dashboard/bunny/${author_id}`)
-  }
-
-  async function handleLikePost() {
-    setLiked(likes + 1)
-    const res = await fetch(`http://192.168.100.16:3000/posts/like?username=${user}&post_id=${_id}`)
-    const data = await res.json()
-  }
-
-  async function handleBookmarkPost() {
-    setNewBookMark(true)
-    const _id = localStorage.getItem('_id')
-    const res = await fetch(`http://192.168.100.16:3000/posts/bookmark-post?_id=${_id}&post_id=${post_id}`)
-    const data = await res.json()
-    toast.success('Post added to bookmarks.', {
-      icon: <Bookmark />,
-    })
   }
 
   function handleAddBunny() {
@@ -321,6 +305,29 @@ export function PostCard(props: PostCardProps) {
       <div className="">
         <img className=" h-[359px] w-full  object-cover  " src={image} alt="" />
       </div>
+    )
+  }
+
+  const FollowButton = () => {
+    return (
+      <>
+        {!postIsFromFollowing && (
+          <div className="">
+            {!isFollowing ? (
+              <button onClick={handleAddBunny} className="flex gap-x-2">
+                <UserPlus size={28} color="white" />
+              </button>
+            ) : (
+              <ChatButton bunny_id={author_id} />
+            )}
+          </div>
+        )}
+        {postIsFromFollowing && (
+          <button onClick={handleAddBunny} className="flex gap-x-2">
+            <ChatButton bunny_id={author_id} />
+          </button>
+        )}
+      </>
     )
   }
 
@@ -336,13 +343,7 @@ export function PostCard(props: PostCardProps) {
             <p className="text-sm text-light">@{authorUsername}</p>
           </div>
         </div>
-        {!isFollowing ? (
-          <button onClick={handleAddBunny} className="flex gap-x-2">
-            <UserPlus size={28} color="white" />
-          </button>
-        ) : (
-          <ChatButton bunny_id={author_id} />
-        )}
+        <FollowButton />
       </div>
     )
   }
@@ -356,19 +357,26 @@ export function PostCard(props: PostCardProps) {
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-x-6 ">
           <div className="flex gap-x-4">
-            <div onClick={handleLikePost} className="flex cursor-pointer items-center gap-x-1">
-              <Heart size={28} fill={isLiked || liked ? 'red' : 'white'} color="red" />
-              <p className="text-sm text-light">{!liked ? likes : liked}</p>
-            </div>
+            {/* <div onClick={handleLikePost} className="flex cursor-pointer items-center gap-x-1">
+              <Heart size={28} fill={isLiked ? 'red' : 'white'} color="red" />
+              <p className="text-sm text-light">{!newLike ? likes : newLike}</p>
+            </div> */}
+            <LikeButton liked={liked} post_id={post_id} likes={likes} />
           </div>
           <button onClick={handleTipModal} className="flex gap-x-2">
             <CircleDollarSign size={28} color="white" />
             <span className="text-light">Tip</span>
           </button>
         </div>
-        <button onClick={handleBookmarkPost} className="">
+        {/* <button onClick={handleBookmarkPost} className="">
           <Bookmark size={28} color={isBookmarked || newBookMark ? 'rgb(217 70 239 ' : 'white'} />
-        </button>
+        </button> */}
+        <BookmarkButton
+          isBookmarked={isBookmarked}
+          newBookMark={newBookMark}
+          post_id={post_id}
+          setNewBookMark={setNewBookMark}
+        />
       </div>
     )
   }

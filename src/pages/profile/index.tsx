@@ -99,13 +99,34 @@ function ProfileHeader({ avatar }: { avatar: string | undefined }) {
   )
 }
 
-function Bio({ name, bio, username }: { name: string | undefined; bio: string; username: string }) {
+function Bio({
+  name,
+  bio,
+  username,
+  online,
+  last_seen,
+}: {
+  name: string | undefined
+  bio: string
+  username: string
+  online: boolean
+  last_seen: string
+}) {
   return (
     <>
-      <div className="p-2">
-        <p className="primary-text">{name}</p>
-        <p className="text-gray-400">@{username}</p>
-        <span className="text-light">{bio}</span>
+      <div className="px-4 py-2">
+        <div className="flex">
+          <div className="flex flex-col  ">
+            <span className="primary-text first-letter:uppercase">{name}</span>
+            <div className="flex items-center gap-x-2">
+              <span className="text-gray-400">@{username}</span>
+              <p className="text-sm text-light">{online ? 'Online' : last_seen} </p>
+            </div>
+          </div>
+        </div>
+        <div className="py-2">
+          <p className="text-light">{bio}</p>
+        </div>
       </div>
       <hr className="mt-4" />
     </>
@@ -124,7 +145,7 @@ function SearchBarColumn() {
 }
 
 function MainProfile({ bunny, posts, following }: { bunny: bunny; posts: Post[]; following: boolean }) {
-  const { avatar, name, _id, bio, username, pricing } = bunny
+  const { avatar, name, _id, bio, username, pricing, online, last_seen } = bunny
   return (
     <>
       <div className="col-span-4 w-full">
@@ -135,7 +156,7 @@ function MainProfile({ bunny, posts, following }: { bunny: bunny; posts: Post[];
           bunny_name={name}
           bunny_id={_id as string}
         />
-        <Bio username={username} bio={bio} name={name} />
+        <Bio online={online} last_seen={last_seen} username={username} bio={bio} name={name} />
         <div className="md:hidden">
           <EventBooker
             bunny_username={username}
@@ -161,6 +182,7 @@ export function Profile({ username, bunnies }) {
   const bunny = bunnies?.find((b) => b._id === id)
   const { name: bunnyName, isFollowing } = bunny ?? {}
 
+  // TODO: CHANGE SERVER URL
   async function getBunnyPosts() {
     const res = await fetch(`http://192.168.100.16:3000/bunny/posts?bunny_id=${id}&username=${username}`)
     const data = await res.json()

@@ -19,6 +19,16 @@ export default {
       type: 'string',
     },
     {
+      name: 'online',
+      title: 'Online',
+      type: 'boolean',
+    },
+    {
+      name: 'last_seen',
+      title: 'Last Seen',
+      type: 'string',
+    },
+    {
       name: 'recommended',
       title: 'recommended',
       type: 'boolean',

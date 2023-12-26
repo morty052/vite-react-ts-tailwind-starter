@@ -138,6 +138,7 @@ export function EventsPage() {
 
   const _id = localStorage.getItem('_id')
 
+  // TODO: CHANGE SERVER URL
   async function getEvents() {
     const res = await fetch(`http://192.168.100.16:3000/users/events?_id=${_id}`)
     const data = await res.json()
