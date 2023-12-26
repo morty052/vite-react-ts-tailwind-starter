@@ -3,8 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui
 import { useState } from 'react'
 import { Camera, MoreVertical, Table, Video } from 'lucide-react'
 import { Button } from 'src/components/ui/button'
-import { ChatButton } from 'src/components'
-import { useSearchParams } from 'react-router-dom'
+import { ChatButton, EmptyState } from 'src/components'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from 'src/components/ui/skeleton'
 
@@ -134,7 +133,6 @@ const Feed = ({ items, loading }: any) => {
 export function EventsPage() {
   // const [events, setEvents] = useState<Event[]>([])
   // const { username } = useChatContextParams()
-  const [searchParams, setSearchParams] = useSearchParams()
 
   const _id = localStorage.getItem('_id')
 
@@ -146,7 +144,7 @@ export function EventsPage() {
     return events
   }
 
-  const { isLoading, error, data: events } = useQuery({ queryKey: ['events'], queryFn: getEvents })
+  const { isLoading, data: events } = useQuery({ queryKey: ['events'], queryFn: getEvents })
 
   // useEffect(() => {
   //   if (!username) {
@@ -167,14 +165,14 @@ export function EventsPage() {
             Events
           </TabsTrigger>
           <TabsTrigger className="tab_trigger data-[state=active]:text-white " value="calendar">
-            Calendar
+            Completed
           </TabsTrigger>
         </TabsList>
         <TabsContent value="events">
           <Feed items={events} loading={isLoading} />
         </TabsContent>
         <TabsContent value="calendar">
-          <UserCalender />
+          <EmptyState description="No completed events" />
         </TabsContent>
       </Tabs>
     </>

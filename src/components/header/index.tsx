@@ -245,6 +245,13 @@ export function Header({ bunnies }) {
     return false
   }, [path])
 
+  const isSettings = useMemo(() => {
+    if (path.includes('profile')) {
+      return true
+    }
+    return false
+  }, [path])
+
   const bunny_id = isProfile ? path.replace('/dashboard/bunny/', '') : ''
   const bunny = bunnies?.find((b) => b._id === bunny_id)
   const { name: bunnyName } = bunny ?? {}
@@ -270,11 +277,22 @@ export function Header({ bunnies }) {
   return (
     <>
       <div className="sticky inset-x-0 top-0 z-10 border-b border-white/20 bg-black  ">
-        <div className="flex items-center justify-between px-2 py-4">
-          {!isSecondaryHeader ? <p className="primary-text">Bunnies</p> : <Backbutton />}
-          <SearchInput searching={searching} bunnies={bunnies} setSearching={setSearching} />
-          <DefaultHeaderButtons searching={searching} setSearching={setSearching} />
-        </div>
+        {!isSettings && (
+          <div className="flex items-center justify-between px-2 py-4">
+            {!isSecondaryHeader ? <p className="primary-text">Bunnies</p> : <Backbutton />}
+            <SearchInput searching={searching} bunnies={bunnies} setSearching={setSearching} />
+            <DefaultHeaderButtons searching={searching} setSearching={setSearching} />
+          </div>
+        )}
+        {isSettings && (
+          <div className="flex items-center justify-between px-2 py-4">
+            <div className="flex items-center gap-x-2 text-light" onClick={() => navigate(-1)}>
+              <span>&#8592;</span>
+              <span>Back</span>
+            </div>
+            {/* <button className="">Save</button> */}
+          </div>
+        )}
       </div>
     </>
   )

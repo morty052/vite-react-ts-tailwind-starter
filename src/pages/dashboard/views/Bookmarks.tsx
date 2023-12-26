@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { PostCard } from 'src/components'
+import { EmptyState, PostCard } from 'src/components'
 import { Skeleton } from 'src/components/ui/skeleton'
 
 const Feed = ({ items, loading }: any) => {
@@ -49,7 +49,7 @@ const Feed = ({ items, loading }: any) => {
 export function Bookmarks() {
   const [loading, setLoading] = useState(false)
 
-  async function getPosts() {
+  async function getBookmarks() {
     const _id = localStorage.getItem('_id')
     const res = await fetch(`http://192.168.100.16:3000/posts/bookmarks?_id=${_id}`)
     const data = await res.json()
@@ -59,7 +59,13 @@ export function Bookmarks() {
     // setPosts(posts)
   }
 
-  const { isLoading, error, data: postsData } = useQuery({ queryKey: ['bookmarks'], queryFn: getPosts })
+  const { isLoading, error, data: postsData } = useQuery({ queryKey: ['bookmarks'], queryFn: getBookmarks })
+
+  if (postsData?.length < 1) {
+    console.log(postsData)
+    return <EmptyState description="No bookmarks yet" />
+  }
+
   return (
     <div>
       <Feed items={postsData} loading={isLoading} />

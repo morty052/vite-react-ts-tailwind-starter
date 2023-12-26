@@ -116,7 +116,7 @@ export function DashBoard() {
         <Route path="/calendar" element={<EventsPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
-        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/profile/*" element={<UserProfile />} />
         <Route path="/wallet/*" element={<Wallet />} />
       </Route>
       <Route path="/directmessages" element={<DirectMessages />} />

@@ -325,17 +325,70 @@ export const bookmarkPost = async (_id, post_id) => {
     console.error(error)
   }
 }
+export const GetBookmarks = async (user_id) => {
+  // const query = `*[_type == "posts" && references("${user_id}")]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{username}, bookmarkers[] -> {_id}}`
+  const query = `*[_type == "users" && _id == "${user_id}"].bookmarked[] -> {...,author-> {name, avatar, username, _id, followers[] -> {_id}},  likedby[]->{_id} }`
+  try {
+    const result = await client.fetch(query)
+    if (result < 1) {
+      return []
+    }
+    const posts = result?.map((post) => {
+      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post ?? {}
+      const { name, avatar, username: authorUsername, _id: author_id, followers: authorFollowers } = author ?? {}
+      const authorAvatar = urlFor(avatar).url()
+      const likedBy = likedByData?.map((likedBy) => {
+        return likedBy._id
+      })
 
+      const followers = authorFollowers?.map((follower) => {
+        return follower._id
+      })
+
+      const isFollowing = followers?.includes(user_id)
+
+      const liked = likedBy.includes(user_id)
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+        isBookmarked: true,
+        isFollowing: isFollowing || false,
+        liked,
+      }
+    })
+    console.log(posts)
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+// TODO: REMOVE BOOKMARK FROM USER SIDE TOO
 export const removePostBookmark = async (_id, post_id) => {
   try {
     const bookmarks = await client.fetch(`*[_type == "posts" && _id == "${post_id}"].bookmarkers[] -> {_id}`)
     const bookMarkersArray = Array.from(bookmarks, (b) => b._id)
     const bookmarkToRemove = bookMarkersArray.indexOf(_id)
-    console.log(bookmarkToRemove)
+
+    const query = `*[_type == "users" && _id == "${_id}"].bookmarked[] -> _id`
+    const result = await client.fetch(query)
+    const userBookmarkToRemove = result.indexOf(_id)
 
     await client
       .patch(post_id)
       .unset([`bookmarkers[${bookmarkToRemove}]`])
+      .commit()
+
+    await client
+      .patch(_id)
+      .unset([`bookmarked[${userBookmarkToRemove}]`])
       .commit()
   } catch (error) {
     console.error(error)
@@ -632,51 +685,6 @@ export const unLikePost = async (post_id, _id) => {
       .commit()
   } catch (error) {
     console.error(error)
-  }
-}
-
-export const GetBookmarks = async (user_id) => {
-  const query = `*[_type == "posts" && references("${user_id}")]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{username}, bookmarkers[] -> {_id}}`
-  try {
-    const result = await client.fetch(query)
-    const posts = result?.map((post) => {
-      const { author, likes, text, _createdAt, _id, likedby: likedByData, bookmarkers } = post ?? {}
-      const { name, avatar, username: authorUsername, _id: author_id, followers: authorFollowers } = author ?? {}
-      const authorAvatar = urlFor(avatar).url()
-      const likedBy = likedByData?.map((likedBy) => {
-        return likedBy.username
-      })
-
-      const bookMarks = bookmarkers?.map((post) => {
-        return post._id
-      })
-
-      const followers = authorFollowers?.map((follower) => {
-        return follower._id
-      })
-
-      const isFollowing = followers?.includes(user_id)
-
-      const isBookmarked = bookMarks?.includes(user_id)
-
-      return {
-        _id,
-        text,
-        image: urlFor(post.image).url(),
-        likes,
-        likedBy,
-        authorAvatar,
-        authorName: name,
-        authorUsername,
-        author_id,
-        time: _createdAt,
-        isBookmarked: isBookmarked || false,
-        isFollowing: isFollowing || false,
-      }
-    })
-    return posts
-  } catch (error) {
-    console.log(error)
   }
 }
 

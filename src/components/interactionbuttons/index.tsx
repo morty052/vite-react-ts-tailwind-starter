@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Bookmark, Heart, MessageCircle, UserPlus } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -16,9 +17,7 @@ type TchatButtonProps = {
 }
 
 type TbookMarkProps = {
-  setNewBookMark: React.Dispatch<React.SetStateAction<boolean>>
   isBookmarked: boolean
-  newBookMark: boolean
   post_id: string
 }
 
@@ -29,10 +28,16 @@ type TLikeButtonProps = {
 }
 
 export function BookmarkButton(props: TbookMarkProps) {
-  const { setNewBookMark, isBookmarked, newBookMark, post_id } = props
+  const { isBookmarked, post_id } = props
+  const [newBookMark, setNewBookMark] = useState(false)
+  const [unBookedMark, setUnBookedMark] = useState(false)
 
+  const queryClient = useQueryClient()
+
+  // TODO CHANGE SERVER URL
   async function handleRemoveBookMark() {
     setNewBookMark(false)
+    setUnBookedMark(true)
     const _id = localStorage.getItem('_id')
     await fetch(`http://192.168.100.16:3000/posts/remove-bookmark?_id=${_id}&post_id=${post_id}`)
     toast.success('Post removed from bookmarks.', {
@@ -40,6 +45,7 @@ export function BookmarkButton(props: TbookMarkProps) {
     })
   }
 
+  // TODO CHANGE SERVER URL
   async function handleBookmarkPost() {
     if (isBookmarked) {
       setNewBookMark(false)
@@ -60,6 +66,10 @@ export function BookmarkButton(props: TbookMarkProps) {
   }
 
   const bookmarked = useMemo(() => {
+    if (unBookedMark) {
+      return false
+    }
+
     if (isBookmarked) {
       return true
     }
@@ -69,10 +79,27 @@ export function BookmarkButton(props: TbookMarkProps) {
     }
 
     return false
-  }, [isBookmarked, newBookMark])
+  }, [isBookmarked, newBookMark, unBookedMark])
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      setNewBookMark(false)
+      setUnBookedMark(true)
+      const _id = localStorage.getItem('_id')
+      await fetch(`http://192.168.100.16:3000/posts/remove-bookmark?_id=${_id}&post_id=${post_id}`)
+      await queryClient.invalidateQueries({
+        queryKey: ['bookmarks'],
+        refetchType: 'active',
+      })
+      // queryClient.setQueryData(['bookmarks'], [])
+      toast.success('Post removed from bookmarks.', {
+        icon: <Bookmark />,
+      })
+    },
+  })
 
   return (
-    <button onClick={handleBookmarkPost} className="">
+    <button onClick={isBookmarked ? () => mutation.mutate() : handleBookmarkPost} className="">
       <Bookmark size={28} color={bookmarked ? 'rgb(217 70 239 ' : 'white'} />
     </button>
   )
@@ -106,7 +133,6 @@ export function ChatButton({ bunny_id }: TchatButtonProps) {
   )
 }
 
-// TODO : ADD UNLIKED FUNCTION
 // TODO CHANGE SERVER URL
 export function LikeButton(props: TLikeButtonProps) {
   const { liked, likes, post_id } = props

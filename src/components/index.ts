@@ -1,6 +1,7 @@
 export * from './navbar'
 export * from './bottomnav'
 export * from './interactionModal'
+export * from './tippingmodal'
 export * from './sidebar'
 export * from './header'
 export * from './recommendations'
