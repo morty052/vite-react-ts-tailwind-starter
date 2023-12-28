@@ -8,3 +8,8 @@ export const generateChatToken = (user_id) => {
   const token = chatClient.createToken(user_id)
   return token
 }
+
+export const createUser = (bunny_name) => {
+  const token = chatClient.upsertUser({ id: bunny_name, name: bunny_name })
+  return token
+}

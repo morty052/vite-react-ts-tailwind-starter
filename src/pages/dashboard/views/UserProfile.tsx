@@ -21,10 +21,10 @@ const settingsArray = [
     title: 'Privacy and safety',
     to: 'privacy',
   },
-  {
-    title: 'Payments and Billing',
-    to: 'payments',
-  },
+  // {
+  //   title: 'Payments and Billing',
+  //   to: 'billing',
+  // },
   {
     title: 'Manage Referrals',
     to: 'referral',
@@ -128,7 +128,7 @@ function AccountSettings(params: type) {
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
             placeholder={email}
-            className="w-full max-w-md rounded-lg border border-light bg-transparent p-2 text-light "
+            className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
             type="text"
           />
         </div>
@@ -138,7 +138,7 @@ function AccountSettings(params: type) {
             value={username}
             onChange={(e) => setnewUsername(e.target.value)}
             placeholder={username}
-            className="w-full max-w-md rounded-lg border border-light bg-transparent p-2 text-light "
+            className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
             type="text"
           />
         </div>
@@ -151,7 +151,7 @@ function AccountSettings(params: type) {
             value={newPassWord}
             onChange={(e) => setNewPassWord(e.target.value)}
             placeholder={'Password'}
-            className="w-full max-w-md rounded-lg border border-light bg-transparent p-2 text-light "
+            className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
             type="password"
           />
         </div>
@@ -162,7 +162,7 @@ function AccountSettings(params: type) {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder={'Password'}
-              className="w-full max-w-md rounded-lg border border-light bg-transparent p-2 text-light "
+              className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
               type="password"
             />
           </div>
@@ -175,7 +175,9 @@ function AccountSettings(params: type) {
         />
       </div>
 
-      <p className="text-lg font-medium text-red-500">Delete Account</p>
+      <Button disabled={!newEmail} className="w-full bg-fuchsia-500">
+        <span className="text-lg">Save</span>
+      </Button>
     </div>
   )
 }
@@ -185,7 +187,7 @@ function NotificationSettings(params: type) {
   const [eventEmails, seteventEmails] = useState(true)
 
   return (
-    <div className="space-y-4 p-2">
+    <div className="mx-auto max-w-lg space-y-4 p-2">
       <p className="font-medium text-light">Email Notifications</p>
       <div className="w-full space-y-2">
         <CheckBoxField
@@ -208,12 +210,14 @@ function NotificationSettings(params: type) {
         />
 
         <CheckBoxField
-          title="Referrals"
-          description="Get Notified when someone signs up using your referral link."
+          title="Posts"
+          description="Get Notified when bunnies you follow uploads a new post."
           // checked={eventEmails}
           setChecked={seteventEmails}
         />
-        <Button className="w-full ">Save</Button>
+        <div className="pt-4">
+          <Button className="w-full bg-fuchsia-500 ">Save</Button>
+        </div>
       </div>
     </div>
   )
@@ -222,7 +226,7 @@ function NotificationSettings(params: type) {
 function PrivacyAndSafety(params: type) {
   const [enable2FA, setEnable2FA] = useState(false)
   return (
-    <div className="space-y-4 px-2 py-2">
+    <div className="mx-auto max-w-lg space-y-4 px-2 py-2">
       <p className="text-lg font-medium text-light">Privacy and security</p>
       <CheckBoxField
         title="Public Balance"
@@ -247,6 +251,9 @@ function PrivacyAndSafety(params: type) {
           Sign out of all other devices
         </p>
         {/* <ChevronRight color="white" /> */}
+      </div>
+      <div className="pt-4">
+        <Button className="w-full bg-fuchsia-500 ">Save</Button>
       </div>
     </div>
   )
@@ -255,32 +262,12 @@ function PrivacyAndSafety(params: type) {
 function PaymentsAndBilling(params: type) {
   const [enable2FA, setEnable2FA] = useState(false)
   return (
-    <div className="space-y-4 px-2 py-2">
-      <p className="text-lg font-medium text-light">Privacy and security</p>
-      <CheckBoxField
-        title="Public Balance"
-        description="Allow Bunnies see your credits."
-        checked={enable2FA}
-        setChecked={setEnable2FA}
-      />
-      <CheckBoxField
-        title="Public Profile"
-        description="Allow bunnies send me direct messages first."
-        checked={enable2FA}
-        setChecked={setEnable2FA}
-      />
-      <CheckBoxField
-        title="Sessions"
-        description="Allow your account to be used across multiple devices."
-        checked={enable2FA}
-        setChecked={setEnable2FA}
-      />
-      <div className="flex justify-between px-2">
-        <p className="cursor-pointer text-lg font-medium text-light hover:text-blue-700">
-          Sign out of all other devices
-        </p>
-        {/* <ChevronRight color="white" /> */}
-      </div>
+    <div className="py-10">
+      <svg className="mx-auto h-[400px] w-[600px] border">
+        <line y1={30} y2={-20} x1={0} x2={45} stroke="red" strokeWidth={5} />
+        <line y1={30} y2={'100%'} x1={0} x2={0} stroke="blue" strokeWidth={5} />
+        <line y1={'100%'} y2={'100%'} x1={'30%'} x2={'100%'} stroke="green" strokeWidth={5} />
+      </svg>
     </div>
   )
 }
@@ -324,8 +311,14 @@ function Referrals(params: type) {
         checked={milestoneAlert}
         setChecked={setMilestoneAlert}
       />
+      <CheckBoxField
+        title="Referrals"
+        description="Get Notified when someone signs up using your referral link."
+        // checked={eventEmails}
+        setChecked={setMilestoneAlert}
+      />
       <Button className="w-full bg-fuchsia-500">
-        <span className="text-lg">Generate new Link</span>
+        <span className="text-lg">Save</span>
       </Button>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">

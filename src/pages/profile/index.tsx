@@ -10,6 +10,7 @@ import { useChatContextParams } from 'src/contexts/ChatContext'
 import { bunny } from 'src/types/bunny'
 import { Post } from 'src/types/post'
 import { Dialog, DialogContent } from 'src/components/ui/dialog'
+import { day } from 'src/lib/day'
 
 function SubscriptionModal({ open, setOpen, eventName, handleCreateEvent, insufficientBalance }) {
   const EventConfirmation = () => {
@@ -112,6 +113,27 @@ function Bio({
   online: boolean
   last_seen: string
 }) {
+  const last_seen_online = '2023-12-27T22:27:32Z'
+  const time_ago = last_seen ? day(last_seen).fromNow() : ''
+
+  const OnlineIcon = () => {
+    return (
+      <div className="flex items-center gap-x-2">
+        <p className="text-light">Online</p>
+        <div className="h-2 w-2 rounded-full bg-green-400"></div>
+      </div>
+    )
+  }
+
+  const LastSeen = () => {
+    return (
+      <div className="flex items-center gap-x-2">
+        <p className="text-light">{`Last seen ${time_ago}`}</p>
+        <div className="h-2 w-2 rounded-full bg-slate-400"></div>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="px-4 py-2">
@@ -120,7 +142,7 @@ function Bio({
             <span className="primary-text first-letter:uppercase">{name}</span>
             <div className="flex items-center gap-x-2">
               <span className="text-gray-400">@{username}</span>
-              <p className="text-sm text-light">{online ? 'Online' : last_seen} </p>
+              <div className="">{online ? <OnlineIcon /> : <LastSeen />} </div>
             </div>
           </div>
         </div>

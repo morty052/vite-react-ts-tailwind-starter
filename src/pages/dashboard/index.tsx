@@ -3,16 +3,30 @@ import { BottomNav, Header, RecommendationBar, Sidebar } from 'src/components'
 import { Bunnies } from '../bunnies'
 import { Profile } from '../profile'
 import { EventsPage, NotificationsPage, UserProfile, DirectMessages, Wallet, ChatPage, Bookmarks } from './views'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 
 function DashBoardLayout({ bunnies, recommended }) {
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const [first, setfirst] = useState(false)
+
+  // function handleScroll(x) {
+  //   if (x < 500) {
+  //     return
+  //   }
+  //   console.log('reached')
+  // }
+
   return (
     <div className=" mx-auto max-w-7xl ">
       <div className={`flex`}>
         <Sidebar />
-        <div className="dashboard-routes relative h-screen w-full overflow-y-scroll lg:w-[70%] xl:w-[47.5%] ">
+        <div
+          ref={bodyRef}
+          // onScroll={() => handleScroll(bodyRef?.current?.scrollTop)}
+          className="dashboard-routes relative h-screen w-full overflow-y-scroll lg:w-[70%] xl:w-[47.5%] "
+        >
           <Header bunnies={bunnies} />
           <Outlet />
         </div>

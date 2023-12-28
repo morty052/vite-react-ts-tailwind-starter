@@ -118,9 +118,16 @@ const MenuDropDown = ({ name }) => {
   )
 }
 
-const SearchResult = ({ avatar, name, username, _id }) => {
+const SearchResult = ({ avatar, name, username, _id, setSearching, setQuery }) => {
   return (
-    <Link to={`/dashboard/bunny/${_id}`} className="flex items-center gap-x-2 border-y px-2 py-2 first:border-t-0 ">
+    <Link
+      onClick={() => {
+        setSearching(false)
+        setQuery('')
+      }}
+      to={`/dashboard/bunny/${_id}`}
+      className="flex items-center gap-x-2 border-y px-2 py-2 first:border-t-0 "
+    >
       <img className="h-10 w-10 rounded-full object-cover" src={avatar} alt="" />
       <div className="flex flex-1 items-center justify-between">
         <div className="">
@@ -164,7 +171,15 @@ const SearchInput = ({
 
               {results &&
                 results.map((b) => (
-                  <SearchResult key={b._id} _id={b._id} username={b.username} name={b.name} avatar={b.avatar} />
+                  <SearchResult
+                    setQuery={setQuery}
+                    setSearching={setSearching}
+                    key={b._id}
+                    _id={b._id}
+                    username={b.username}
+                    name={b.name}
+                    avatar={b.avatar}
+                  />
                 ))}
             </div>
           </div>

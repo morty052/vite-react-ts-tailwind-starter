@@ -700,28 +700,28 @@ export const init = async (_id) => {
     const postsFromFollowingQuery = await client.fetch(
       `*[_type == "bunnies" && references("${_id}")]{..., posts[]->{...,author->{name, avatar, username, _id}, likedby[]->{username}}}`,
     )
-    const postData = postsFromFollowingQuery?.map((bunny) => bunny.posts).flat()
-    const postsFromFollowing = postData?.map((post) => {
-      const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
-      const { name, avatar, username: authorUsername, _id: author_id } = author
-      const authorAvatar = urlFor(avatar).url()
-      const likedBy = likedByData?.map((likedBy) => {
-        return likedBy.username
-      })
+    // const postData = postsFromFollowingQuery?.map((bunny) => bunny.posts).flat()
+    // const postsFromFollowing = postData?.map((post) => {
+    //   const { author, likes, text, _createdAt, _id, likedby: likedByData } = post ?? {}
+    //   const { name, avatar, username: authorUsername, _id: author_id } = author ?? {}
+    //   const authorAvatar = urlFor(avatar).url()
+    //   const likedBy = likedByData?.map((likedBy) => {
+    //     return likedBy.username
+    //   })
 
-      return {
-        _id,
-        text,
-        image: urlFor(post.image).url(),
-        likes,
-        likedBy,
-        authorAvatar,
-        authorName: name,
-        authorUsername,
-        author_id,
-        time: _createdAt,
-      }
-    })
+    //   return {
+    //     _id,
+    //     text,
+    //     image: post.image ? urlFor(post.image).url() : '',
+    //     likes,
+    //     likedBy,
+    //     authorAvatar,
+    //     authorName: name,
+    //     authorUsername,
+    //     author_id,
+    //     time: _createdAt,
+    //   }
+    // })
 
     const events = userEvents?.map((event) => {
       return {
@@ -763,7 +763,7 @@ export const init = async (_id) => {
       const likedBy = likedByData?.map((likedBy) => {
         return likedBy._id
       })
-      const liked = likedBy.includes(_id)
+      const liked = likedBy?.includes(_id)
 
       return {
         _id: post_id,
@@ -790,8 +790,8 @@ export const init = async (_id) => {
     return {
       events,
       bunnies,
-      posts,
-      postsFromFollowing,
+      // posts,
+      // postsFromFollowing,
       recommended,
     }
   } catch (error) {

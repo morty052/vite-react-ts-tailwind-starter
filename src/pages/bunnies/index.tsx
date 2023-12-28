@@ -46,7 +46,7 @@ const Feed = ({ items, loading, postIsFromFollowing }: any) => {
   }
 
   return (
-    <div className="pb-10">
+    <div onScroll={() => console.log('enter')} className="h-screen pb-10">
       {items?.map((post: PostCardProps, index: number) => {
         return (
           <div key={index} className="">

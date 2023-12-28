@@ -130,7 +130,7 @@ const TipConfirmation = (props: any) => {
             </Button>
           </Link>
         )}
-        <p className="text-center text-sm font-medium text-blue-700">Tip bunny directly.</p>
+        {/* <p className="text-center text-sm font-medium text-blue-700">Tip bunny directly.</p> */}
       </div>
     )
   }

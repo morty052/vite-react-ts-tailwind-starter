@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { Button } from '../ui/button'
@@ -21,9 +22,47 @@ type ReccomendationCardProps = {
   cover: string
 }
 
-const SearchResult = ({ avatar, name, username, _id }) => {
+function BunnyCarousel({ recommended }: { recommended: any }) {
+  const stackItem = recommended?.slice(0, 3)
+  const stackItem_2 = recommended?.slice(3, 6)
+
+  const ReccommendedStack = ({ stack }: { stack: any[] }) => {
+    return (
+      <div className="space-y-2">
+        <ReccomendationCard {...stack?.[0]} />
+        <ReccomendationCard {...stack?.[1]} />
+        <ReccomendationCard {...stack?.[2]} />
+      </div>
+    )
+  }
+
   return (
-    <Link to={`/dashboard/bunny/${_id}`} className="flex items-center gap-x-2 border-y px-2 py-2 first:border-t-0 ">
+    <Carousel className=" mt-4 w-[95%]">
+      <CarouselContent>
+        {/* {stackItem?.map((bunny: any, index: number) => (
+        ))} */}
+        <CarouselItem className="">
+          <ReccommendedStack stack={stackItem} />
+        </CarouselItem>
+        <CarouselItem className="">
+          <ReccommendedStack stack={stackItem_2} />
+        </CarouselItem>
+      </CarouselContent>
+      <CarouselPrevious className=" " />
+      <CarouselNext />
+    </Carousel>
+  )
+}
+
+const SearchResult = ({ avatar, name, username, _id, setQuery }) => {
+  return (
+    <Link
+      onClick={() => {
+        setQuery('')
+      }}
+      to={`/dashboard/bunny/${_id}`}
+      className="flex items-center gap-x-2 border-y px-2 py-2 first:border-t-0 "
+    >
       <img className="h-10 w-10 rounded-full object-cover" src={avatar} alt="" />
       <div className="flex flex-1 items-center justify-between">
         <div className="">
@@ -53,14 +92,21 @@ const SearchBar = ({ bunnies }) => {
         <Search color="white" />
       </search>
       {query && (
-        <div className="absolute inset-x-0 z-10  ">
-          <div className="mt-1 rounded-md bg-white p-2">
+        <div className="absolute inset-x-0 z-50  ">
+          <div className="z-50 mt-1 rounded-md bg-white p-2">
             {!query && <p className="text-center">Search for bunnies</p>}
             {query && results.length === 0 && <p className="text-center">No Results</p>}
 
             {results &&
               results.map((b) => (
-                <SearchResult key={b._id} _id={b._id} username={b.username} name={b.name} avatar={b.avatar} />
+                <SearchResult
+                  setQuery={setQuery}
+                  key={b._id}
+                  _id={b._id}
+                  username={b.username}
+                  name={b.name}
+                  avatar={b.avatar}
+                />
               ))}
           </div>
         </div>
@@ -82,9 +128,9 @@ const ReccomendationCard = ({ name, avatar, username, _id, cover }: Reccomendati
             <DropdownMenuLabel>{name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Add to bunnies</DropdownMenuItem>
-            <DropdownMenuItem>Subscribe</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
+            <DropdownMenuItem>Bookmark</DropdownMenuItem>
+            <DropdownMenuItem>Report</DropdownMenuItem>
+            <DropdownMenuItem>Block</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -96,7 +142,7 @@ const ReccomendationCard = ({ name, avatar, username, _id, cover }: Reccomendati
       <MenuButton />
       <img
         onClick={() => navigate(`/dashboard/bunny/${_id}`)}
-        className="absolute bottom-2 left-2 z-10 h-24 w-24 rounded-full border-2 object-cover"
+        className="absolute bottom-2 left-2 z-10 h-24 w-24 cursor-pointer rounded-full border-2 object-cover"
         src={avatar}
         alt=""
       />
@@ -182,7 +228,7 @@ export function RecommendationBar({ bunnies, recommended }: any) {
   return (
     <div className=" scrollbar-hidden  hidden h-screen w-full max-w-sm space-y-4  overflow-scroll border-l  border-white/10  px-2 lg:block">
       <div className="flex  flex-col items-center gap-y-2 py-4">
-        {!isProfile && <SearchBar bunnies={bunnies} />}
+        <SearchBar bunnies={bunnies} />
         {/* {isProfile && <SubscriptionStatus />} */}
         {isProfile && (
           <EventBooker
@@ -193,7 +239,8 @@ export function RecommendationBar({ bunnies, recommended }: any) {
             bunny_id={_id as string}
           />
         )}
-        {<Reccomendations recommended={recommended} />}
+        {!isProfile && <BunnyCarousel recommended={recommended} />}
+        {/* {<Reccomendations recommended={recommended} />} */}
       </div>
     </div>
   )

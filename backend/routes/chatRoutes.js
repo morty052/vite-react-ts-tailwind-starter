@@ -1,5 +1,5 @@
 import express from 'express'
-import { generateChatToken } from '../lib/chatClient.js'
+import { createUser, generateChatToken } from '../lib/chatClient.js'
 
 export const chatRoutes = express.Router()
 
@@ -15,4 +15,16 @@ chatRoutes.get('/token', (req, res) => {
   })
 
   console.log('sent', token, user_id)
+})
+
+chatRoutes.get('/create-user', async (req, res) => {
+  const params = req.query
+  const { bunny_name } = params
+
+  const token = await createUser(bunny_name)
+
+  res.send({
+    token,
+    status: 'user created',
+  })
 })

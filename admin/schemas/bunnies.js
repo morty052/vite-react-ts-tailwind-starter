@@ -126,5 +126,11 @@ export default {
         },
       ],
     },
+    {
+      name: 'pimp',
+      title: 'Pimp',
+      type: 'reference',
+      to: [{type: 'pimps'}],
+    },
   ],
 }

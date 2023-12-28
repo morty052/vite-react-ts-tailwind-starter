@@ -107,28 +107,6 @@ export default {
               type: 'reference',
               to: [{type: 'bunnies'}],
             },
-            // {
-            //   name: 'type',
-            //   title: 'type',
-            //   type: 'object',
-            //   fields: [
-            //     {
-            //       name: 'topup',
-            //       title: 'Topup',
-            //       type: 'boolean',
-            //     },
-            //     {
-            //       name: 'refund',
-            //       title: 'Refund',
-            //       type: 'boolean',
-            //     },
-            //     {
-            //       name: 'purchase',
-            //       title: 'Purchase',
-            //       type: 'boolean',
-            //     },
-            //   ],
-            // },
             {
               name: 'date',
               title: 'Date',
@@ -143,6 +121,106 @@ export default {
               name: 'event',
               title: 'Event',
               type: 'string',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'settings',
+      title: 'Settings',
+      type: 'object',
+      fields: [
+        {
+          name: 'account_settings',
+          title: 'Account Settings',
+          type: 'object',
+          fields: [
+            {
+              name: 'username',
+              title: 'Username',
+              type: 'string',
+            },
+            {
+              name: 'email',
+              title: 'Email',
+              type: 'string',
+            },
+            {
+              name: 'password',
+              title: 'Password',
+              type: 'string',
+            },
+            {
+              name: '2fa',
+              title: '2FA',
+              type: 'boolean',
+            },
+          ],
+        },
+        {
+          name: 'notification_settings',
+          title: 'Notification Settings',
+          type: 'object',
+          fields: [
+            {
+              name: 'marketing_emails',
+              title: 'marketing Emails',
+              type: 'boolean',
+            },
+            {
+              name: 'event_emails',
+              title: 'Event Emails',
+              type: 'boolean',
+            },
+            {
+              name: 'direct_messages',
+              title: 'direct_messages',
+              type: 'boolean',
+            },
+            {
+              name: 'posts_emails',
+              title: 'Posts Emails',
+              type: 'boolean',
+            },
+          ],
+        },
+        {
+          name: 'privacy_settings',
+          title: 'Privacy Settings',
+          type: 'object',
+          fields: [
+            {
+              name: 'public_balance',
+              title: 'Public Balance',
+              type: 'boolean',
+            },
+            {
+              name: 'public_profile',
+              title: 'Public profile',
+              type: 'boolean',
+            },
+            {
+              name: 'sessions',
+              title: 'sessions',
+              type: 'boolean',
+            },
+          ],
+        },
+        {
+          name: 'referral_settings',
+          title: 'Referral Settings',
+          type: 'object',
+          fields: [
+            {
+              name: 'milestone_alerts',
+              title: 'Milestone alerts',
+              type: 'boolean',
+            },
+            {
+              name: 'referral_alerts',
+              title: 'Referral alerts',
+              type: 'boolean',
             },
           ],
         },

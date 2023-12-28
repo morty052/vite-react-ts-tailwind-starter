@@ -1,7 +1,7 @@
 import { Calendar } from 'src/components/ui/calendar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs'
 import { useState } from 'react'
-import { Camera, MoreVertical, Table, Video } from 'lucide-react'
+import { Camera, Table, Video } from 'lucide-react'
 import { Button } from 'src/components/ui/button'
 import { ChatButton, EmptyState } from 'src/components'
 import { useQuery } from '@tanstack/react-query'
@@ -75,7 +75,6 @@ function Event({ event }: { event: Event }) {
         </div>
         <div className="flex items-center justify-between">
           <ChatButton bunny_id={bunny_id} />
-          <MoreVertical color="white" />
         </div>
       </div>
     )
