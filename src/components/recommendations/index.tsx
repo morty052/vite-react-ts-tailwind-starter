@@ -37,20 +37,25 @@ function BunnyCarousel({ recommended }: { recommended: any }) {
   }
 
   return (
-    <Carousel className=" mt-4 w-[95%]">
-      <CarouselContent>
-        {/* {stackItem?.map((bunny: any, index: number) => (
+    <>
+      <div className=" flex w-[95%] items-start">
+        <p className="primary-text text-left">Recommended</p>
+      </div>
+      <Carousel className=" mt-2 w-[95%]">
+        <CarouselContent>
+          {/* {stackItem?.map((bunny: any, index: number) => (
         ))} */}
-        <CarouselItem className="">
-          <ReccommendedStack stack={stackItem} />
-        </CarouselItem>
-        <CarouselItem className="">
-          <ReccommendedStack stack={stackItem_2} />
-        </CarouselItem>
-      </CarouselContent>
-      <CarouselPrevious className=" " />
-      <CarouselNext />
-    </Carousel>
+          <CarouselItem className="">
+            <ReccommendedStack stack={stackItem} />
+          </CarouselItem>
+          <CarouselItem className="">
+            <ReccommendedStack stack={stackItem_2} />
+          </CarouselItem>
+        </CarouselContent>
+        <CarouselPrevious className=" " />
+        <CarouselNext />
+      </Carousel>
+    </>
   )
 }
 
@@ -139,7 +144,8 @@ const ReccomendationCard = ({ name, avatar, username, _id, cover }: Reccomendati
 
   return (
     <div className="relative min-h-[128px]  w-full max-w-sm rounded-md border  ">
-      <MenuButton />
+      {/* TODO: add menu */}
+      {/* <MenuButton /> */}
       <img
         onClick={() => navigate(`/dashboard/bunny/${_id}`)}
         className="absolute bottom-2 left-2 z-10 h-24 w-24 cursor-pointer rounded-full border-2 object-cover"

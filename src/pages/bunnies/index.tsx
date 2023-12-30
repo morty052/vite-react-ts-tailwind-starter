@@ -2,7 +2,7 @@ import { Heart, MessageSquare } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { likeBunny } from './features'
-import { PostCard, PostCardProps } from 'src/components'
+import { EmptyState, PostCard, PostCardProps } from 'src/components'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'src/components/ui/tabs'
 import { Skeleton } from 'src/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
@@ -77,6 +77,8 @@ const BunnyTabs = () => {
 
   const { posts, postsFromFollowing } = postsData ?? {}
 
+  console.log(postsFromFollowing)
+
   // useEffect(() => {
   //   if (!username) {
   //     return
@@ -86,7 +88,7 @@ const BunnyTabs = () => {
 
   return (
     <Tabs defaultValue="foryou" className=" w-full">
-      <TabsList className="flex bg-transparent">
+      <TabsList className=" flex bg-transparent">
         <TabsTrigger className=" tab_trigger data-[state=active]:text-white " value="foryou">
           For You
         </TabsTrigger>
@@ -101,7 +103,7 @@ const BunnyTabs = () => {
         {postsFromFollowing?.length > 0 ? (
           <Feed postIsFromFollowing loading={isLoading} items={postsFromFollowing} />
         ) : (
-          <p className="primary-text">Not following yet</p>
+          <EmptyState description="Follow Bunnies to see posts" />
         )}
       </TabsContent>
     </Tabs>

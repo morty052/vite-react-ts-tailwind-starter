@@ -31,7 +31,7 @@ const NavigateToDashBoard = () => {
     return null
   }
 
-  return <Navigate to={`/dashboard/?_id=${id}`} />
+  return <Navigate to={`/dashboard`} />
 }
 
 export function SignInPage() {

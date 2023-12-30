@@ -1,8 +1,9 @@
-import { ChevronDown, ChevronUp, CreditCard, PlusCircle, RabbitIcon } from 'lucide-react'
+import { ChevronDown, ChevronUp, CreditCard, DollarSign, PlusCircle, RabbitIcon } from 'lucide-react'
 import { useChatContextParams } from 'src/contexts/ChatContext'
 import { useState, useEffect } from 'react'
 import { Link, Route, Routes } from 'react-router-dom'
 import { Button } from 'src/components/ui/button'
+import { EmptyState, Loader } from 'src/components'
 
 type order = {
   _id: string
@@ -40,12 +41,17 @@ const WalletActionsButton = ({ credits }: { credits: number }) => {
   return (
     <div className="flex items-center justify-between  p-2">
       <div className="flex items-center gap-x-2">
-        <p className="text-2xl font-semibold text-light">{credits ? credits : 0}</p>
-        <RabbitIcon color="pink" />
+        <div className="">
+          <p className="font-medium text-light">Credits</p>
+          <div className="flex items-center gap-x-2">
+            <p className="text-2xl font-semibold text-light">{credits ? credits : 0}</p>
+            <DollarSign color="pink" />
+          </div>
+        </div>
       </div>
-      <Link to="/dashboard/wallet/packages" className="flex items-center gap-x-2">
-        <p className="text-sm text-light">Add Credits</p>
-        <PlusCircle color="pink" />
+      <Link to="/dashboard/wallet/packages" className="flex items-center gap-x-2 text-fuchsia-500">
+        <p className="text-sm font-semibold text-light hover:text-blue-700">Add Credits</p>
+        <PlusCircle />
       </Link>
     </div>
   )
@@ -360,9 +366,16 @@ const WalletView = ({ credits, orders }: { credits: number; orders: order[] }) =
   return (
     <div className="mx-auto h-screen max-w-xl">
       <WalletActionsButton credits={credits as number} />
+      <hr className="  mt-4 border-white/10" />
       {/* <CardForm /> */}
-      <OrdersHeader setTransactionsExpanded={setTransactionsExpanded} transactionsExpanded={transactionsExpanded} />
-      <UserOrders transactionsExpanded={transactionsExpanded} orders={orders} />
+      {orders.length > 0 ? (
+        <div className="">
+          <OrdersHeader setTransactionsExpanded={setTransactionsExpanded} transactionsExpanded={transactionsExpanded} />
+          <UserOrders transactionsExpanded={transactionsExpanded} orders={orders} />
+        </div>
+      ) : (
+        <EmptyState description="No transactions yet" />
+      )}
     </div>
   )
 }
@@ -414,7 +427,7 @@ export function Wallet() {
   }, [username])
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loader />
   }
 
   return (

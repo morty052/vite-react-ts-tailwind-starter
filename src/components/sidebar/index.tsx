@@ -1,6 +1,7 @@
 import { Calendar, LogOutIcon, MessageCircleIcon, RabbitIcon, UserCircle, Wallet } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useChatContextParams } from 'src/contexts/ChatContext'
+import { SignOutButton as ClerkSignOutButton } from '@clerk/clerk-react'
 
 const sidebarLinks = [
   {
@@ -74,9 +75,11 @@ const SidebarLink = ({ name, path, icon }: { name: string; path: string; icon: R
 
 const SignOutButton = () => {
   return (
-    <button className="ml-2 mt-10 grid h-12 w-12 place-content-center rounded-full ">
-      <LogOutIcon size={34} />
-    </button>
+    <ClerkSignOutButton signOutCallback={() => window.location.replace('/')}>
+      <button className="ml-2 mt-10 grid h-12 w-12 place-content-center rounded-full ">
+        <LogOutIcon size={34} />
+      </button>
+    </ClerkSignOutButton>
   )
 }
 

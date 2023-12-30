@@ -152,8 +152,8 @@ export default {
               type: 'string',
             },
             {
-              name: '2fa',
-              title: '2FA',
+              name: 'two_factor_authentication',
+              title: 'Two factor authentication',
               type: 'boolean',
             },
           ],

@@ -7,6 +7,7 @@ import { Button } from 'src/components/ui/button'
 import { Switch } from 'src/components/ui/switch'
 import { motion } from 'framer-motion'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../components/ui/accordion'
+import { Loader } from 'src/components'
 
 const settingsArray = [
   {
@@ -104,6 +105,15 @@ function AccountSettings(params: type) {
   const [newPassWord, setNewPassWord] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [newUsername, setnewUsername] = useState('')
+
+  const [newAccountSettings, setNewAccountSettings] = useState({
+    two_factor_authentication: false,
+    email: '',
+    password: '',
+    confirmPassword: '',
+    username: '',
+  })
+
   // @ts-expect-error
   const { data } = useQuery({ queryKey: ['user_profile'], queryFn: getUser })
 
@@ -125,8 +135,8 @@ function AccountSettings(params: type) {
           <p className="text-sm text-light">Email</p>
           <input
             autoComplete="email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
+            value={newAccountSettings.email}
+            onChange={(e) => setNewAccountSettings({ ...newAccountSettings, email: e.target.value })}
             placeholder={email}
             className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
             type="text"
@@ -135,8 +145,8 @@ function AccountSettings(params: type) {
         <div className="w-full space-y-1">
           <p className="text-sm text-light">Username</p>
           <input
-            value={username}
-            onChange={(e) => setnewUsername(e.target.value)}
+            value={newAccountSettings.username}
+            onChange={(e) => setNewAccountSettings({ ...newAccountSettings, username: e.target.value })}
             placeholder={username}
             className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
             type="text"
@@ -148,19 +158,19 @@ function AccountSettings(params: type) {
         <div className="w-full space-y-1">
           <p className="text-sm text-light">Change Password</p>
           <input
-            value={newPassWord}
-            onChange={(e) => setNewPassWord(e.target.value)}
+            value={newAccountSettings.password}
+            onChange={(e) => setNewAccountSettings({ ...newAccountSettings, password: e.target.value })}
             placeholder={'Password'}
             className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
             type="password"
           />
         </div>
-        {newPassWord && (
+        {newAccountSettings.password && (
           <div className="w-full space-y-1">
             <p className="text-sm text-light">Confirm new Password</p>
             <input
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={newAccountSettings.confirmPassword}
+              onChange={(e) => setNewAccountSettings({ ...newAccountSettings, confirmPassword: e.target.value })}
               placeholder={'Password'}
               className="w-full max-w-lg rounded-lg border border-light bg-transparent p-2 text-light "
               type="password"
@@ -170,12 +180,16 @@ function AccountSettings(params: type) {
         <CheckBoxField
           title="Enable 2FA"
           description="Receive 2FA authentication email when you sign in."
-          checked={enable2FA}
-          setChecked={setEnable2FA}
+          checked={newAccountSettings.two_factor_authentication}
+          setChecked={() => setNewAccountSettings({ ...newAccountSettings, two_factor_authentication: !enable2FA })}
         />
       </div>
 
-      <Button disabled={!newEmail} className="w-full bg-fuchsia-500">
+      <Button
+        onClick={() => console.log(newAccountSettings)}
+        disabled={!newAccountSettings.email}
+        className="w-full bg-fuchsia-500"
+      >
         <span className="text-lg">Save</span>
       </Button>
     </div>
@@ -186,6 +200,13 @@ function NotificationSettings(params: type) {
   const [marketingEmails, setmarketingEmails] = useState(true)
   const [eventEmails, seteventEmails] = useState(true)
 
+  const [notificationSettings, setNotificationSettings] = useState({
+    marketing_emails: true,
+    event_emails: true,
+    direct_messages: true,
+    posts_emails: true,
+  })
+
   return (
     <div className="mx-auto max-w-lg space-y-4 p-2">
       <p className="font-medium text-light">Email Notifications</p>
@@ -194,26 +215,26 @@ function NotificationSettings(params: type) {
           title="Marketing Emails"
           description="Receive emails about new products, features, and more."
           checked={marketingEmails}
-          setChecked={setmarketingEmails}
+          setChecked={() => setNotificationSettings({ ...notificationSettings, marketing_emails: !marketingEmails })}
         />
         <CheckBoxField
           title="Event Emails"
           description="Receive remainder emails about your upcoming events."
           // checked={eventEmails}
-          setChecked={seteventEmails}
+          setChecked={() => setNotificationSettings({ ...notificationSettings, event_emails: !eventEmails })}
         />
         <CheckBoxField
           title="Direct Messages"
           description="Get Notified when you have a new direct message."
           // checked={eventEmails}
-          setChecked={seteventEmails}
+          setChecked={() => setNotificationSettings({ ...notificationSettings, event_emails: !eventEmails })}
         />
 
         <CheckBoxField
           title="Posts"
           description="Get Notified when bunnies you follow uploads a new post."
           // checked={eventEmails}
-          setChecked={seteventEmails}
+          setChecked={() => setNotificationSettings({ ...notificationSettings, event_emails: !eventEmails })}
         />
         <div className="pt-4">
           <Button className="w-full bg-fuchsia-500 ">Save</Button>
@@ -225,33 +246,32 @@ function NotificationSettings(params: type) {
 
 function PrivacyAndSafety(params: type) {
   const [enable2FA, setEnable2FA] = useState(false)
+  const [privacySettings, setprivacySettings] = useState({
+    public_balance: false,
+    public_profile: false,
+    sessions: false,
+  })
   return (
     <div className="mx-auto max-w-lg space-y-4 px-2 py-2">
       <p className="text-lg font-medium text-light">Privacy and security</p>
       <CheckBoxField
         title="Public Balance"
         description="Allow Bunnies see your credits."
-        checked={enable2FA}
-        setChecked={setEnable2FA}
+        checked={privacySettings.public_balance}
+        setChecked={() => setprivacySettings({ ...privacySettings, public_balance: !enable2FA })}
       />
       <CheckBoxField
         title="Public Profile"
         description="Allow bunnies send me direct messages first."
-        checked={enable2FA}
-        setChecked={setEnable2FA}
+        checked={privacySettings.public_profile}
+        setChecked={() => setprivacySettings({ ...privacySettings, public_profile: !enable2FA })}
       />
       <CheckBoxField
         title="Sessions"
         description="Allow your account to be used across multiple devices."
-        checked={enable2FA}
-        setChecked={setEnable2FA}
+        checked={privacySettings.sessions}
+        setChecked={() => setprivacySettings({ ...privacySettings, sessions: !enable2FA })}
       />
-      <div className="flex justify-between px-2">
-        <p className="cursor-pointer text-lg font-medium text-light hover:text-blue-700">
-          Sign out of all other devices
-        </p>
-        {/* <ChevronRight color="white" /> */}
-      </div>
       <div className="pt-4">
         <Button className="w-full bg-fuchsia-500 ">Save</Button>
       </div>
@@ -332,8 +352,21 @@ function Referrals(params: type) {
 
 // TODO : ADD SETTINGS LOGIC
 
-// TODO: ADD MORE SETTINGS
 export function UserProfile() {
+  async function getUserSettings(params: type) {
+    const _id = localStorage.getItem('_id')
+    const res = await fetch(`http://192.168.100.16:3000/users/settings?_id=${_id}`)
+    const data = await res.json()
+    const { settings } = data
+    return settings
+  }
+
+  const { data: settings, isLoading } = useQuery(['settings'], getUserSettings)
+
+  if (isLoading) {
+    return <Loader />
+  }
+
   return (
     <div className="scrollbar-hidden  space-y-2 overflow-scroll  pb-24  ">
       {/* <div className="mx-auto max-w-md space-y-4 py-4">

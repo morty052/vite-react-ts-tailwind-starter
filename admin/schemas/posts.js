@@ -25,6 +25,11 @@ export default {
       type: 'boolean',
     },
     {
+      name: 'home_page',
+      title: 'Home page',
+      type: 'boolean',
+    },
+    {
       name: 'likes',
       title: 'Likes',
       type: 'number',

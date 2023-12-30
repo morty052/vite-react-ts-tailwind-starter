@@ -55,6 +55,54 @@ export const getUserById = async (_id, full) => {
   }
 }
 
+export const createUser = async (username, email) => {
+  const user = {
+    _type: 'users',
+    username,
+    email,
+    credits: 100,
+    settings: {
+      account_settings: {
+        username,
+        email,
+        two_factor_authentication: false,
+      },
+      notification_settings: {
+        marketing_emails: true,
+        direct_messages: false,
+        event_emails: true,
+        posts_emails: true,
+      },
+      privacy_settings: {
+        public_balance: true,
+        public_profile: true,
+        sessions: true,
+      },
+      referral_settings: {
+        milestone_alerts: true,
+        referral_alerts: true,
+      },
+    },
+  }
+  try {
+    const { _id } = await client.create(user)
+    console.log(_id)
+    return _id
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getUserSettings = async (_id) => {
+  try {
+    const user = await getUserById(_id)
+    const { settings } = user
+    return settings
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export const getAllBunnies = async (username) => {
   const user = await getUser(username)
   const { _id } = user
@@ -245,20 +293,6 @@ export const getUserBunnies = async (username) => {
     return bunnies
   } catch (error) {
     console.error(error)
-  }
-}
-
-export const createUser = async (username, email) => {
-  const user = {
-    _type: 'users',
-    username,
-    email,
-    credits: 100,
-  }
-  try {
-    await client.create(user)
-  } catch (error) {
-    console.log(error)
   }
 }
 
@@ -615,16 +649,52 @@ export const getAllPosts = async (user_id) => {
   }
 }
 
+export const getHomePosts = async () => {
+  try {
+    const query = `*[_type == "posts" && home_page]{..., author-> {name, avatar, username, _id, followers[] -> {_id}}, likedby[]->{_id}, bookmarkers[] -> {_id}}`
+    const result = await client.fetch(query)
+
+    const posts = result.map((post) => {
+      const { author, likes, text, _createdAt, _id } = post
+      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const authorAvatar = urlFor(avatar).url()
+
+      return {
+        _id,
+        text,
+        image: urlFor(post.image).url(),
+        likes,
+        authorAvatar,
+        authorName: name,
+        authorUsername,
+        author_id,
+        time: _createdAt,
+      }
+    })
+
+    return posts
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 export const getPostsFromFollowing = async (_id) => {
   try {
     // const user = await getUser(username)
     // const { _id } = user
     const query = `*[_type == "bunnies" && references("${_id}")]{..., posts[]->{...,author->{name, avatar, username, _id}, likedby[]->{username}}}`
     const result = await client.fetch(query)
-    const postData = result?.map((bunny) => bunny.posts).flat()
+    const postData = result
+      ?.map((bunny) => bunny.posts)
+      .flat()
+      .filter((post) => post)
+    console.log(postData)
     const posts = postData?.map((post) => {
+      if (!post) {
+        return
+      }
       const { author, likes, text, _createdAt, _id, likedby: likedByData } = post
-      const { name, avatar, username: authorUsername, _id: author_id } = author
+      const { name, avatar, username: authorUsername, _id: author_id } = author ?? {}
       const authorAvatar = urlFor(avatar).url()
       const likedBy = likedByData?.map((likedBy) => {
         return likedBy.username
@@ -644,6 +714,7 @@ export const getPostsFromFollowing = async (_id) => {
         postIsFromFollowing: true,
       }
     })
+    console.log(posts)
     return posts
   } catch (error) {
     console.error(error)

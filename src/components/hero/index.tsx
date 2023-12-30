@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { OnboardingForm } from 'src/pages'
+import bg from '../../assets/bg.jpg'
 
 // const OnboardingForm = () => {
 //   const [signingUp, setsigningUp] = useState(true)
@@ -93,19 +94,20 @@ export const Hero = () => {
   const { t } = useTranslation()
 
   return (
-    <div className="mx-auto grid w-full max-w-sm gap-y-4 sm:max-w-none sm:grid-cols-2 ">
+    <div className="mx-auto w-full gap-y-4 sm:grid  sm:h-[calc(100vh-4rem)] sm:max-w-none sm:grid-cols-2 ">
       <div className="relative  sm:pt-20">
         <div
           style={{
-            backgroundImage:
-              "url('https://img.freepik.com/free-vector/abstract-organic-pattern-design-background_1048-19286.jpg?w=740&t=st=1702809438~exp=1702810038~hmac=5d6e79c1dde5b1b96cb000f2793484bd62419fc702da115aaf29a911be9691f6')",
+            backgroundImage: `url(${bg})`,
             backgroundSize: 'cover',
           }}
           className="absolute inset-0 -z-50 hidden  sm:block"
         ></div>
-        <div className="z-50 mx-auto max-w-sm  sm:px-4">
+        <div className="z-50 mx-auto  px-2 pt-4 sm:px-4   sm:pt-0 md:max-w-sm">
           <p className="text-4xl font-semibold text-light sm:text-5xl sm:text-fuchsia-500">Vite Bunnies</p>
-          <p className="text-lg text-light sm:text-fuchsia-500">Premium adult content according to your demands</p>
+          <p className="text-lg font-medium text-light sm:text-fuchsia-500 md:text-2xl">
+            Premium adult content how you need it when you need it
+          </p>
         </div>
       </div>
       <OnboardingForm />

@@ -11,6 +11,7 @@ import {
   getUserBunnies,
   init,
   getUserById,
+  getUserSettings,
 } from '../lib/sanityClient.js'
 import { updateAuthUsername } from '../lib/clerk.js'
 
@@ -61,12 +62,13 @@ userRoutes.get('/create', async (req, res) => {
   const params = req.query
   const { username, email } = params
 
-  await createUser(username, email)
+  const _id = await createUser(username, email)
 
   res.send({
     message: 'User Created',
     success: true,
     error: false,
+    _id,
   })
 })
 
@@ -81,6 +83,19 @@ userRoutes.get('/fetch-user', async (req, res) => {
     success: true,
     error: false,
     user,
+  })
+})
+userRoutes.get('/settings', async (req, res) => {
+  const params = req.query
+  const { _id } = params
+
+  const settings = await getUserSettings(_id)
+
+  res.send({
+    message: 'User fetched',
+    success: true,
+    error: false,
+    settings,
   })
 })
 

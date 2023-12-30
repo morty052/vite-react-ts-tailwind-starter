@@ -7,6 +7,7 @@ import {
   GetBookmarks,
   removePostBookmark,
   unLikePost,
+  getHomePosts,
 } from '../lib/sanityClient.js'
 
 export const postRoutes = express.Router()
@@ -18,6 +19,13 @@ postRoutes.get('/', async (req, res) => {
   res.send({
     posts,
     postsFromFollowing,
+  })
+})
+
+postRoutes.get('/home_posts', async (req, res) => {
+  const posts = await getHomePosts()
+  res.send({
+    posts,
   })
 })
 
